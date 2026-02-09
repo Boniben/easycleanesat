@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TempsContact index{% endblock %}
+
+{% block body %}
+    <h1>TempsContact index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>TempsContact</th>
+                <th>Picto</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for temps_contact in temps_contacts %}
+            <tr>
+                <td>{{ temps_contact.id }}</td>
+                <td>{{ temps_contact.tempsContact }}</td>
+                <td>{{ temps_contact.picto }}</td>
+                <td>
+                    <a href="{{ path('app_temps_contact_show', {'id': temps_contact.id}) }}">show</a>
+                    <a href="{{ path('app_temps_contact_edit', {'id': temps_contact.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_temps_contact_new') }}">Create new</a>
+{% endblock %}

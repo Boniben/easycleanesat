@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MeoProduit index{% endblock %}
+
+{% block body %}
+    <h1>MeoProduit index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>VolumeProduit</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for meo_produit in meo_produits %}
+            <tr>
+                <td>{{ meo_produit.id }}</td>
+                <td>{{ meo_produit.volumeProduit }}</td>
+                <td>
+                    <a href="{{ path('app_meo_produit_show', {'id': meo_produit.id}) }}">show</a>
+                    <a href="{{ path('app_meo_produit_edit', {'id': meo_produit.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_meo_produit_new') }}">Create new</a>
+{% endblock %}
