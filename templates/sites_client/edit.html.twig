@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit SitesClient{% endblock %}
+
+{% block body %}
+    <h1>Edit SitesClient</h1>
+
+    {{ include('sites_client/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_sites_client_index') }}">back to list</a>
+
+    {{ include('sites_client/_delete_form.html.twig') }}
+{% endblock %}
