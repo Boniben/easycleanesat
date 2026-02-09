@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Redacteur index{% endblock %}
+
+{% block body %}
+    <h1>Redacteur index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Initial</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for redacteur in redacteurs %}
+            <tr>
+                <td>{{ redacteur.id }}</td>
+                <td>{{ redacteur.initial }}</td>
+                <td>
+                    <a href="{{ path('app_redacteur_show', {'id': redacteur.id}) }}">show</a>
+                    <a href="{{ path('app_redacteur_edit', {'id': redacteur.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_redacteur_new') }}">Create new</a>
+{% endblock %}

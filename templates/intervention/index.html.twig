@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Intervention index{% endblock %}
+
+{% block body %}
+    <h1>Intervention index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>NumVersion</th>
+                <th>DateCreation</th>
+                <th>DateModification</th>
+                <th>NbTravailleur</th>
+                <th>DureeHeure</th>
+                <th>DureeMinute</th>
+                <th>LundiMatHd</th>
+                <th>LundiMatHf</th>
+                <th>LundiApHd</th>
+                <th>LundiApHf</th>
+                <th>MardiMatHd</th>
+                <th>MardiMatHf</th>
+                <th>MardiApHd</th>
+                <th>MardiApHf</th>
+                <th>MercrediMatHd</th>
+                <th>MercrediMatHf</th>
+                <th>MercrediApHd</th>
+                <th>MercrediApHf</th>
+                <th>JeudiMatHd</th>
+                <th>JeudiMatHf</th>
+                <th>JeudiApHd</th>
+                <th>JeudiApHf</th>
+                <th>VendrediMatHd</th>
+                <th>VendrediMatHf</th>
+                <th>VendrediApHd</th>
+                <th>VendrediApHf</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for intervention in interventions %}
+            <tr>
+                <td>{{ intervention.id }}</td>
+                <td>{{ intervention.numVersion }}</td>
+                <td>{{ intervention.dateCreation ? intervention.dateCreation|date('Y-m-d') : '' }}</td>
+                <td>{{ intervention.dateModification ? intervention.dateModification|date('Y-m-d') : '' }}</td>
+                <td>{{ intervention.nbTravailleur }}</td>
+                <td>{{ intervention.dureeHeure }}</td>
+                <td>{{ intervention.dureeMinute }}</td>
+                <td>{{ intervention.lundiMatHd ? intervention.lundiMatHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.lundiMatHf ? intervention.lundiMatHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.lundiApHd ? intervention.lundiApHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.lundiApHf ? intervention.lundiApHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mardiMatHd ? intervention.mardiMatHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mardiMatHf ? intervention.mardiMatHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mardiApHd ? intervention.mardiApHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mardiApHf ? intervention.mardiApHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mercrediMatHd ? intervention.mercrediMatHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mercrediMatHf ? intervention.mercrediMatHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mercrediApHd ? intervention.mercrediApHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.mercrediApHf ? intervention.mercrediApHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.jeudiMatHd ? intervention.jeudiMatHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.jeudiMatHf ? intervention.jeudiMatHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.jeudiApHd ? intervention.jeudiApHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.jeudiApHf ? intervention.jeudiApHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.vendrediMatHd ? intervention.vendrediMatHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.vendrediMatHf ? intervention.vendrediMatHf|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.vendrediApHd ? intervention.vendrediApHd|date('H:i:s') : '' }}</td>
+                <td>{{ intervention.vendrediApHf ? intervention.vendrediApHf|date('H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_intervention_show', {'id': intervention.id}) }}">show</a>
+                    <a href="{{ path('app_intervention_edit', {'id': intervention.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="28">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_intervention_new') }}">Create new</a>
+{% endblock %}
