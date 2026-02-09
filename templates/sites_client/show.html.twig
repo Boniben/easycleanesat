@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SitesClient{% endblock %}
+
+{% block body %}
+    <h1>SitesClient</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ sites_client.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ sites_client.nom }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_sites_client_index') }}">back to list</a>
+
+    <a href="{{ path('app_sites_client_edit', {'id': sites_client.id}) }}">edit</a>
+
+    {{ include('sites_client/_delete_form.html.twig') }}
+{% endblock %}

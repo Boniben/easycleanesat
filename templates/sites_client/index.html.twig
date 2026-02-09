@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SitesClient index{% endblock %}
+
+{% block body %}
+    <h1>SitesClient index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sites_client in sites_clients %}
+            <tr>
+                <td>{{ sites_client.id }}</td>
+                <td>{{ sites_client.nom }}</td>
+                <td>
+                    <a href="{{ path('app_sites_client_show', {'id': sites_client.id}) }}">show</a>
+                    <a href="{{ path('app_sites_client_edit', {'id': sites_client.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_sites_client_new') }}">Create new</a>
+{% endblock %}

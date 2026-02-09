@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ZonesClient index{% endblock %}
+
+{% block body %}
+    <h1>ZonesClient index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for zones_client in zones_clients %}
+            <tr>
+                <td>{{ zones_client.id }}</td>
+                <td>{{ zones_client.nom }}</td>
+                <td>
+                    <a href="{{ path('app_zones_client_show', {'id': zones_client.id}) }}">show</a>
+                    <a href="{{ path('app_zones_client_edit', {'id': zones_client.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_zones_client_new') }}">Create new</a>
+{% endblock %}
