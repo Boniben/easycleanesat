@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Vigilance{% endblock %}
+
+{% block body %}
+    <h1>Create new Vigilance</h1>
+
+    {{ include('vigilance/_form.html.twig') }}
+
+    <a href="{{ path('app_vigilance_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}VigilanceIntervention index{% endblock %}
+
+{% block body %}
+    <h1>VigilanceIntervention index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Detail</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for vigilance_intervention in vigilance_interventions %}
+            <tr>
+                <td>{{ vigilance_intervention.id }}</td>
+                <td>{{ vigilance_intervention.detail }}</td>
+                <td>
+                    <a href="{{ path('app_vigilance_intervention_show', {'id': vigilance_intervention.id}) }}">show</a>
+                    <a href="{{ path('app_vigilance_intervention_edit', {'id': vigilance_intervention.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_vigilance_intervention_new') }}">Create new</a>
+{% endblock %}
