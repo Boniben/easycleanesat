@@ -95,28 +95,24 @@ class Intervention
     private ?\DateTime $vendrediApHf = null;
 
     /**
-     * @var Collection<int, Redacteur>
-     */
-    #[ORM\OneToMany(targetEntity: Redacteur::class, mappedBy: 'intervention')]
-    private Collection $redacteurs;
-
-    /**
-     * @var Collection<int, Vigilance>
-     */
-    #[ORM\ManyToMany(targetEntity: Vigilance::class, mappedBy: 'intervention')]
-    private Collection $vigilances;
-
-    /**
      * @var Collection<int, ElementSecurite>
      */
     #[ORM\ManyToMany(targetEntity: ElementSecurite::class, mappedBy: 'intervention')]
     private Collection $elementSecurites;
 
+    /**
+     * @var Collection<int, VigilanceIntervention>
+     */
+    #[ORM\OneToMany(targetEntity: VigilanceIntervention::class, mappedBy: 'intervention')]
+    private Collection $vigilanceInterventions;
+
+    #[ORM\ManyToOne(inversedBy: 'interventions')]
+    private ?Redacteur $redacteur = null;
+
     public function __construct()
     {
-        $this->redacteurs = new ArrayCollection();
-        $this->vigilances = new ArrayCollection();
         $this->elementSecurites = new ArrayCollection();
+        $this->vigilanceInterventions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -437,63 +433,6 @@ class Intervention
     }
 
     /**
-     * @return Collection<int, Redacteur>
-     */
-    public function getRedacteurs(): Collection
-    {
-        return $this->redacteurs;
-    }
-
-    public function addRedacteur(Redacteur $redacteur): static
-    {
-        if (!$this->redacteurs->contains($redacteur)) {
-            $this->redacteurs->add($redacteur);
-            $redacteur->setIntervention($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRedacteur(Redacteur $redacteur): static
-    {
-        if ($this->redacteurs->removeElement($redacteur)) {
-            // set the owning side to null (unless already changed)
-            if ($redacteur->getIntervention() === $this) {
-                $redacteur->setIntervention(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Vigilance>
-     */
-    public function getVigilances(): Collection
-    {
-        return $this->vigilances;
-    }
-
-    public function addVigilance(Vigilance $vigilance): static
-    {
-        if (!$this->vigilances->contains($vigilance)) {
-            $this->vigilances->add($vigilance);
-            $vigilance->addIntervention($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVigilance(Vigilance $vigilance): static
-    {
-        if ($this->vigilances->removeElement($vigilance)) {
-            $vigilance->removeIntervention($this);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, ElementSecurite>
      */
     public function getElementSecurites(): Collection
@@ -516,6 +455,48 @@ class Intervention
         if ($this->elementSecurites->removeElement($elementSecurite)) {
             $elementSecurite->removeIntervention($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VigilanceIntervention>
+     */
+    public function getVigilanceInterventions(): Collection
+    {
+        return $this->vigilanceInterventions;
+    }
+
+    public function addVigilanceIntervention(VigilanceIntervention $vigilanceIntervention): static
+    {
+        if (!$this->vigilanceInterventions->contains($vigilanceIntervention)) {
+            $this->vigilanceInterventions->add($vigilanceIntervention);
+            $vigilanceIntervention->setIntervention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVigilanceIntervention(VigilanceIntervention $vigilanceIntervention): static
+    {
+        if ($this->vigilanceInterventions->removeElement($vigilanceIntervention)) {
+            // set the owning side to null (unless already changed)
+            if ($vigilanceIntervention->getIntervention() === $this) {
+                $vigilanceIntervention->setIntervention(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getRedacteur(): ?Redacteur
+    {
+        return $this->redacteur;
+    }
+
+    public function setRedacteur(?Redacteur $redacteur): static
+    {
+        $this->redacteur = $redacteur;
 
         return $this;
     }

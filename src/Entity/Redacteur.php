@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\RedacteurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RedacteurRepository::class)]
@@ -16,8 +18,16 @@ class Redacteur
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $initial = null;
 
-    #[ORM\ManyToOne(inversedBy: 'redacteurs')]
-    private ?Intervention $intervention = null;
+    /**
+     * @var Collection<int, Intervention>
+     */
+    #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'redacteur')]
+    private Collection $interventions;
+
+    public function __construct()
+    {
+        $this->interventions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -36,14 +46,32 @@ class Redacteur
         return $this;
     }
 
-    public function getIntervention(): ?Intervention
+    /**
+     * @return Collection<int, Intervention>
+     */
+    public function getInterventions(): Collection
     {
-        return $this->intervention;
+        return $this->interventions;
     }
 
-    public function setIntervention(?Intervention $intervention): static
+    public function addIntervention(Intervention $intervention): static
     {
-        $this->intervention = $intervention;
+        if (!$this->interventions->contains($intervention)) {
+            $this->interventions->add($intervention);
+            $intervention->setRedacteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIntervention(Intervention $intervention): static
+    {
+        if ($this->interventions->removeElement($intervention)) {
+            // set the owning side to null (unless already changed)
+            if ($intervention->getRedacteur() === $this) {
+                $intervention->setRedacteur(null);
+            }
+        }
 
         return $this;
     }

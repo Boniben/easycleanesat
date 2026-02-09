@@ -18,18 +18,18 @@ class Vigilance
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $definition = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $picto = null;
 
     /**
-     * @var Collection<int, Intervention>
+     * @var Collection<int, VigilanceIntervention>
      */
-    #[ORM\ManyToMany(targetEntity: Intervention::class, inversedBy: 'vigilances')]
-    private Collection $intervention;
+    #[ORM\OneToMany(targetEntity: VigilanceIntervention::class, mappedBy: 'vigilance')]
+    private Collection $vigilanceInterventions;
 
     public function __construct()
     {
-        $this->intervention = new ArrayCollection();
+        $this->vigilanceInterventions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -62,25 +62,31 @@ class Vigilance
     }
 
     /**
-     * @return Collection<int, Intervention>
+     * @return Collection<int, VigilanceIntervention>
      */
-    public function getIntervention(): Collection
+    public function getVigilanceInterventions(): Collection
     {
-        return $this->intervention;
+        return $this->vigilanceInterventions;
     }
 
-    public function addIntervention(Intervention $intervention): static
+    public function addVigilanceIntervention(VigilanceIntervention $vigilanceIntervention): static
     {
-        if (!$this->intervention->contains($intervention)) {
-            $this->intervention->add($intervention);
+        if (!$this->vigilanceInterventions->contains($vigilanceIntervention)) {
+            $this->vigilanceInterventions->add($vigilanceIntervention);
+            $vigilanceIntervention->setVigilance($this);
         }
 
         return $this;
     }
 
-    public function removeIntervention(Intervention $intervention): static
+    public function removeVigilanceIntervention(VigilanceIntervention $vigilanceIntervention): static
     {
-        $this->intervention->removeElement($intervention);
+        if ($this->vigilanceInterventions->removeElement($vigilanceIntervention)) {
+            // set the owning side to null (unless already changed)
+            if ($vigilanceIntervention->getVigilance() === $this) {
+                $vigilanceIntervention->setVigilance(null);
+            }
+        }
 
         return $this;
     }

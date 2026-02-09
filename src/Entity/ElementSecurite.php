@@ -15,10 +15,10 @@ class ElementSecurite
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: false)]
+    #[ORM\Column(length: 50, nullable: false)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 50, nullable: false)]
     private ?string $picto = null;
 
     /**
