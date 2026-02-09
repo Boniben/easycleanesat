@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Reutilisable{% endblock %}
+
+{% block body %}
+    <h1>Edit Reutilisable</h1>
+
+    {{ include('reutilisable/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_reutilisable_index') }}">back to list</a>
+
+    {{ include('reutilisable/_delete_form.html.twig') }}
+{% endblock %}
