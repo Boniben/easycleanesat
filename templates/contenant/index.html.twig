@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contenant index{% endblock %}
+
+{% block body %}
+    <h1>Contenant index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>VolumeEau</th>
+                <th>Picto</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contenant in contenants %}
+            <tr>
+                <td>{{ contenant.id }}</td>
+                <td>{{ contenant.nom }}</td>
+                <td>{{ contenant.volumeEau }}</td>
+                <td>{{ contenant.picto }}</td>
+                <td>
+                    <a href="{{ path('app_contenant_show', {'id': contenant.id}) }}">show</a>
+                    <a href="{{ path('app_contenant_edit', {'id': contenant.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_contenant_new') }}">Create new</a>
+{% endblock %}
