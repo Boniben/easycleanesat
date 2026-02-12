@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Form;
 
 use App\Entity\Client;
@@ -17,7 +16,7 @@ class SitesClientType extends AbstractType
             ->add('nom')
             ->add('client', EntityType::class, [
                 'class' => Client::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
         ;
     }

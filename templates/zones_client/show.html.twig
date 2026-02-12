@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ZonesClient{% endblock %}
+{% block title %}Zones Client{% endblock %}
 
 {% block body %}
-    <h1>ZonesClient</h1>
+    <h1>Zones Client</h1>
 
     <table class="table">
         <tbody>
@@ -18,9 +18,9 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_zones_client_index') }}">back to list</a>
+    <a href="{{ path('app_zones_client_index') }}">retour à la liste</a>
 
-    <a href="{{ path('app_zones_client_edit', {'id': zones_client.id}) }}">edit</a>
+    <a href="{{ path('app_zones_client_edit', {'id': zones_client.id}) }}"></a>
 
     {{ include('zones_client/_delete_form.html.twig') }}
 {% endblock %}

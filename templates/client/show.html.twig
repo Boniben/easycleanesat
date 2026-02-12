@@ -1,26 +1,38 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Client{% endblock %}
+{% block title %}Consulter un client{% endblock %}
 
 {% block body %}
-    <h1>Client</h1>
+    <h1>Consulter un client</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ client.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ client.nom }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <p><strong>Nom client :</strong> {{ client.nom }}</p>
 
-    <a href="{{ path('app_client_index') }}">back to list</a>
+    <a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}">Ajouter un site client</a>
 
-    <a href="{{ path('app_client_edit', {'id': client.id}) }}">edit</a>
+    {% for site in client.sitesClients %}
+        <hr>
+        <h2>Nom Site : {{ site.nom }}</h2>
 
+        <h3>Numéros de contrat :</h3>
+        <ul>
+            {% for contrat in site.contrats %}
+                <li>
+                    <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}">
+                        {{ contrat.numero }}
+                    </a>
+                </li>
+            {% else %}
+                <li>Aucun contrat</li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ path('app_contrat_new', {'site_id': site.id}) }}">Ajouter un contrat</a>
+    {% else %}
+        <p>Aucun site pour ce client</p>
+    {% endfor %}
+
+    <hr>
+    <a href="{{ path('app_client_index') }}">Retour à la liste des clients</a>
+    <a href="{{ path('app_client_edit', {'id': client.id}) }}">Modifier</a>
     {{ include('client/_delete_form.html.twig') }}
 {% endblock %}

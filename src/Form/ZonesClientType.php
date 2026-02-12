@@ -18,11 +18,11 @@ class ZonesClientType extends AbstractType
             ->add('nom')
             ->add('sitesClient', EntityType::class, [
                 'class' => SitesClient::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
             ->add('typeZone', EntityType::class, [
                 'class' => TypeZone::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
         ;
     }

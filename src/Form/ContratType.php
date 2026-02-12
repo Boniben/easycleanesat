@@ -17,7 +17,7 @@ class ContratType extends AbstractType
             ->add('numero')
             ->add('sitesClient', EntityType::class, [
                 'class' => SitesClient::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
         ;
     }
