@@ -18,7 +18,7 @@ class ElementSecurite
     #[ORM\Column(length: 50, nullable: false)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 50, nullable: false)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $picto = null;
 
     /**
