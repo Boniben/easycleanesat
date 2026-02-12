@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit TypeSupport{% endblock %}
+{% block title %}Modifier un type de support{% endblock %}
 
 {% block body %}
-    <h1>Edit TypeSupport</h1>
+    <h1>Modifier un type de support</h1>
 
     {{ include('type_support/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('app_type_support_index') }}">back to list</a>
+    <a href="{{ path('app_type_support_index') }}">retour à la liste</a>
 
     {{ include('type_support/_delete_form.html.twig') }}
 {% endblock %}

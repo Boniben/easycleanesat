@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TypeSupport index{% endblock %}
+{% block title %}Type de support{% endblock %}
 
 {% block body %}
-    <h1>TypeSupport index</h1>
+    <h1>Type de support</h1>
 
     <table class="table">
         <thead>
@@ -21,8 +21,8 @@
                 <td>{{ type_support.nom }}</td>
                 <td>{{ type_support.picto }}</td>
                 <td>
-                    <a href="{{ path('app_type_support_show', {'id': type_support.id}) }}">show</a>
-                    <a href="{{ path('app_type_support_edit', {'id': type_support.id}) }}">edit</a>
+                    <a href="{{ path('app_type_support_show', {'id': type_support.id}) }}">Voir</a>
+                    <a href="{{ path('app_type_support_edit', {'id': type_support.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -33,5 +33,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_type_support_new') }}">Create new</a>
+    <a href="{{ path('app_type_support_new') }}">Créer un nouveau type de support</a>
 {% endblock %}
