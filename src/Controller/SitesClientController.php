@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\SitesClient;
 use App\Form\SitesClientType;
 use App\Repository\SitesClientRepository;
@@ -22,10 +22,18 @@ final class SitesClientController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_sites_client_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{client_id}', name: 'app_sites_client_new', methods: ['GET', 'POST'], defaults: ['client_id' => null])]
+    public function new(Request $request, EntityManagerInterface $entityManager, ?int $client_id = null): Response
     {
         $sitesClient = new SitesClient();
+
+        if ($client_id) {
+            $client = $entityManager->getRepository(Client::class)->find($client_id);
+            if ($client) {
+                $sitesClient->setClient($client);
+            }
+        }
+
         $form = $this->createForm(SitesClientType::class, $sitesClient);
         $form->handleRequest($request);
 
@@ -33,7 +41,7 @@ final class SitesClientController extends AbstractController
             $entityManager->persist($sitesClient);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_sites_client_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_client_show', ['id' => $sitesClient->getClient()->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('sites_client/new.html.twig', [
@@ -58,8 +66,7 @@ final class SitesClientController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_sites_client_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_client_show', ['id' => $sitesClient->getClient()->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('sites_client/edit.html.twig', [
@@ -71,11 +78,11 @@ final class SitesClientController extends AbstractController
     #[Route('/{id}', name: 'app_sites_client_delete', methods: ['POST'])]
     public function delete(Request $request, SitesClient $sitesClient, EntityManagerInterface $entityManager): Response
     {
+        $clientId = $sitesClient->getClient()->getId();
         if ($this->isCsrfTokenValid('delete'.$sitesClient->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($sitesClient);
             $entityManager->flush();
         }
-
-        return $this->redirectToRoute('app_sites_client_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
     }
 }

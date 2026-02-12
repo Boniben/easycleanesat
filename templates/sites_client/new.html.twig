@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New SitesClient{% endblock %}
+{% block title %}Ajouter un site client{% endblock %}
 
 {% block body %}
-    <h1>Create new SitesClient</h1>
+    <h1>Ajouter un site client</h1>
 
     {{ include('sites_client/_form.html.twig') }}
 
-    <a href="{{ path('app_sites_client_index') }}">back to list</a>
+    <a href="{{ path('app_client_index') }}">Retour à la liste</a>
 {% endblock %}

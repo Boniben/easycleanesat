@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\SitesClient;
 use App\Entity\ZonesClient;
 use App\Form\ZonesClientType;
 use App\Repository\ZonesClientRepository;
@@ -22,10 +23,18 @@ final class ZonesClientController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_zones_client_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{site_id}', name: 'app_zones_client_new', methods: ['GET', 'POST'], defaults: ['site_id' => null])]
+    public function new(Request $request, EntityManagerInterface $entityManager, ?int $site_id = null): Response
     {
         $zonesClient = new ZonesClient();
+
+        if ($site_id) {
+            $sitesClient = $entityManager->getRepository(SitesClient::class)->find($site_id);
+            if ($sitesClient) {
+                $zonesClient->setSitesClient($sitesClient);
+            }
+        }
+
         $form = $this->createForm(ZonesClientType::class, $zonesClient);
         $form->handleRequest($request);
 
@@ -33,7 +42,8 @@ final class ZonesClientController extends AbstractController
             $entityManager->persist($zonesClient);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_zones_client_index', [], Response::HTTP_SEE_OTHER);
+            $clientId = $zonesClient->getSitesClient()->getClient()->getId();
+            return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('zones_client/new.html.twig', [
@@ -58,8 +68,8 @@ final class ZonesClientController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_zones_client_index', [], Response::HTTP_SEE_OTHER);
+            $clientId = $zonesClient->getSitesClient()->getClient()->getId();
+            return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('zones_client/edit.html.twig', [
@@ -71,11 +81,11 @@ final class ZonesClientController extends AbstractController
     #[Route('/{id}', name: 'app_zones_client_delete', methods: ['POST'])]
     public function delete(Request $request, ZonesClient $zonesClient, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$zonesClient->getId(), $request->getPayload()->getString('_token'))) {
+        $clientId = $zonesClient->getSitesClient()->getClient()->getId();
+        if ($this->isCsrfTokenValid('delete' . $zonesClient->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($zonesClient);
             $entityManager->flush();
         }
-
-        return $this->redirectToRoute('app_zones_client_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
     }
 }

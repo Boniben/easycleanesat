@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Contrat;
+use App\Entity\SitesClient;
 use App\Form\ContratType;
 use App\Repository\ContratRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,10 +23,18 @@ final class ContratController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_contrat_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{site_id}', name: 'app_contrat_new', methods: ['GET', 'POST'], defaults: ['site_id' => null])]
+    public function new(Request $request, EntityManagerInterface $entityManager, ?int $site_id = null): Response
     {
         $contrat = new Contrat();
+
+        if ($site_id) {
+            $sitesClient = $entityManager->getRepository(SitesClient::class)->find($site_id);
+            if ($sitesClient) {
+                $contrat->setSitesClient($sitesClient);
+            }
+        }
+
         $form = $this->createForm(ContratType::class, $contrat);
         $form->handleRequest($request);
 
@@ -33,7 +42,7 @@ final class ContratController extends AbstractController
             $entityManager->persist($contrat);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_client_show', ['id' => $contrat->getSitesClient()->getClient()->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('contrat/new.html.twig', [
@@ -58,8 +67,7 @@ final class ContratController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_client_show', ['id' => $contrat->getSitesClient()->getClient()->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('contrat/edit.html.twig', [
@@ -71,11 +79,11 @@ final class ContratController extends AbstractController
     #[Route('/{id}', name: 'app_contrat_delete', methods: ['POST'])]
     public function delete(Request $request, Contrat $contrat, EntityManagerInterface $entityManager): Response
     {
+        $clientId = $contrat->getSitesClient()->getClient()->getId();
         if ($this->isCsrfTokenValid('delete'.$contrat->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($contrat);
             $entityManager->flush();
         }
-
-        return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
     }
 }

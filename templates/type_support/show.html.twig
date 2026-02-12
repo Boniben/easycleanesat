@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TypeSupport{% endblock %}
+{% block title %}Type de support{% endblock %}
 
 {% block body %}
-    <h1>TypeSupport</h1>
+    <h1>Type de support</h1>
 
     <table class="table">
         <tbody>
@@ -22,9 +22,9 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_type_support_index') }}">back to list</a>
+    <a href="{{ path('app_type_support_index') }}">retour à la liste</a>
 
-    <a href="{{ path('app_type_support_edit', {'id': type_support.id}) }}">edit</a>
+    <a href="{{ path('app_type_support_edit', {'id': type_support.id}) }}">Modifier</a>
 
     {{ include('type_support/_delete_form.html.twig') }}
 {% endblock %}
