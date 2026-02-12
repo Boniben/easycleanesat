@@ -34,6 +34,10 @@ class Actions
     #[ORM\ManyToOne(inversedBy: 'actions')]
     private ?MeoProduit $meo_produit = null;
 
+    #[ORM\ManyToOne(inversedBy: 'actions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Intervention $intervention = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +123,18 @@ class Actions
     public function setMeoProduit(?MeoProduit $meo_produit): static
     {
         $this->meo_produit = $meo_produit;
+
+        return $this;
+    }
+
+    public function getIntervention(): ?Intervention
+    {
+        return $this->intervention;
+    }
+
+    public function setIntervention(?Intervention $intervention): static
+    {
+        $this->intervention = $intervention;
 
         return $this;
     }
