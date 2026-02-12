@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MeoProduitRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MeoProduitRepository::class)]
@@ -30,6 +32,17 @@ class MeoProduit
 
     #[ORM\ManyToOne(inversedBy: 'meoProduits')]
     private ?TempsContact $tempsContact = null;
+
+    /**
+     * @var Collection<int, Actions>
+     */
+    #[ORM\OneToMany(targetEntity: Actions::class, mappedBy: 'meo_produit')]
+    private Collection $actions;
+
+    public function __construct()
+    {
+        $this->actions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -104,6 +117,36 @@ class MeoProduit
     public function setTempsContact(?TempsContact $tempsContact): static
     {
         $this->tempsContact = $tempsContact;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Actions>
+     */
+    public function getActions(): Collection
+    {
+        return $this->actions;
+    }
+
+    public function addAction(Actions $action): static
+    {
+        if (!$this->actions->contains($action)) {
+            $this->actions->add($action);
+            $action->setMeoProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAction(Actions $action): static
+    {
+        if ($this->actions->removeElement($action)) {
+            // set the owning side to null (unless already changed)
+            if ($action->getMeoProduit() === $this) {
+                $action->setMeoProduit(null);
+            }
+        }
 
         return $this;
     }
