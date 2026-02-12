@@ -30,9 +30,16 @@ class ZonesClient
     #[ORM\OneToMany(targetEntity: SupportClient::class, mappedBy: 'zonesClient')]
     private Collection $y;
 
+    /**
+     * @var Collection<int, Intervention>
+     */
+    #[ORM\OneToMany(targetEntity: Intervention::class, mappedBy: 'zonesClient')]
+    private Collection $interventions;
+
     public function __construct()
     {
         $this->y = new ArrayCollection();
+        $this->interventions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -100,6 +107,36 @@ class ZonesClient
             // set the owning side to null (unless already changed)
             if ($y->getZonesClient() === $this) {
                 $y->setZonesClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Intervention>
+     */
+    public function getInterventions(): Collection
+    {
+        return $this->interventions;
+    }
+
+    public function addIntervention(Intervention $intervention): static
+    {
+        if (!$this->interventions->contains($intervention)) {
+            $this->interventions->add($intervention);
+            $intervention->setZonesClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIntervention(Intervention $intervention): static
+    {
+        if ($this->interventions->removeElement($intervention)) {
+            // set the owning side to null (unless already changed)
+            if ($intervention->getZonesClient() === $this) {
+                $intervention->setZonesClient(null);
             }
         }
 

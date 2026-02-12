@@ -109,6 +109,10 @@ class Intervention
     #[ORM\ManyToOne(inversedBy: 'interventions')]
     private ?Redacteur $redacteur = null;
 
+    #[ORM\ManyToOne(inversedBy: 'interventions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ZonesClient $zonesClient = null;
+
     public function __construct()
     {
         $this->elementSecurites = new ArrayCollection();
@@ -497,6 +501,18 @@ class Intervention
     public function setRedacteur(?Redacteur $redacteur): static
     {
         $this->redacteur = $redacteur;
+
+        return $this;
+    }
+
+    public function getZonesClient(): ?ZonesClient
+    {
+        return $this->zonesClient;
+    }
+
+    public function setZonesClient(?ZonesClient $zonesClient): static
+    {
+        $this->zonesClient = $zonesClient;
 
         return $this;
     }
