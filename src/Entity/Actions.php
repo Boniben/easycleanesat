@@ -31,6 +31,9 @@ class Actions
     #[ORM\ManyToOne(inversedBy: 'actions')]
     private ?Support $support = null;
 
+    #[ORM\ManyToOne(inversedBy: 'actions')]
+    private ?MeoProduit $meo_produit = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +107,18 @@ class Actions
     public function setSupport(?Support $support): static
     {
         $this->support = $support;
+
+        return $this;
+    }
+
+    public function getMeoProduit(): ?MeoProduit
+    {
+        return $this->meo_produit;
+    }
+
+    public function setMeoProduit(?MeoProduit $meo_produit): static
+    {
+        $this->meo_produit = $meo_produit;
 
         return $this;
     }
