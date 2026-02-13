@@ -9,6 +9,10 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Nom produit</th>
+                <th>Couleur</th>
+                <th>Nom contenant</th>
+                <th>Nom moyen dilution</th>
                 <th>VolumeProduit</th>
                 <th>actions</th>
             </tr>
@@ -17,6 +21,10 @@
         {% for meo_produit in meo_produits %}
             <tr>
                 <td>{{ meo_produit.id }}</td>
+                <td>{{ meo_produit.produit ? meo_produit.produit.nom : '-' }}</td>
+                <td>{{ meo_produit.produit and meo_produit.produit.couleur ? meo_produit.produit.couleur : '-' }}</td>
+                <td>{{ meo_produit.contenant ? meo_produit.contenant.nom : '-' }}</td>
+                <td>{{ meo_produit.moyenDosage ? meo_produit.moyenDosage.nom : '-' }}</td>
                 <td>{{ meo_produit.volumeProduit }}</td>
                 <td>
                     <a href="{{ path('app_meo_produit_show', {'id': meo_produit.id}) }}">show</a>
@@ -25,7 +33,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">no records found</td>
+                <td colspan="7">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
