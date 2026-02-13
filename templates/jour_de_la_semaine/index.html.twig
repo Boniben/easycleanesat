@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}JourDeLaSemaine index{% endblock %}
+
+{% block body %}
+    <h1>JourDeLaSemaine index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for jour_de_la_semaine in jour_de_la_semaines %}
+            <tr>
+                <td>{{ jour_de_la_semaine.id }}</td>
+                <td>{{ jour_de_la_semaine.nom }}</td>
+                <td>
+                    <a href="{{ path('app_jour_de_la_semaine_show', {'id': jour_de_la_semaine.id}) }}">show</a>
+                    <a href="{{ path('app_jour_de_la_semaine_edit', {'id': jour_de_la_semaine.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_jour_de_la_semaine_new') }}">Create new</a>
+{% endblock %}

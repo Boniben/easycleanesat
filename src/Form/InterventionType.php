@@ -2,9 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\Contrat;
 use App\Entity\ElementSecurite;
 use App\Entity\Intervention;
 use App\Entity\Redacteur;
+use App\Entity\ZonesClient;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,38 +19,30 @@ class InterventionType extends AbstractType
         $builder
             ->add('numVersion')
             ->add('dateCreation')
-            ->add('dateModification')
+            ->add('dateModificaion')
             ->add('nbTravailleur')
             ->add('dureeHeure')
             ->add('dureeMinute')
-            ->add('lundiMatHd')
-            ->add('lundiMatHf')
-            ->add('lundiApHd')
-            ->add('lundiApHf')
-            ->add('mardiMatHd')
-            ->add('mardiMatHf')
-            ->add('mardiApHd')
-            ->add('mardiApHf')
-            ->add('mercrediMatHd')
-            ->add('mercrediMatHf')
-            ->add('mercrediApHd')
-            ->add('mercrediApHf')
-            ->add('jeudiMatHd')
-            ->add('jeudiMatHf')
-            ->add('jeudiApHd')
-            ->add('jeudiApHf')
-            ->add('vendrediMatHd')
-            ->add('vendrediMatHf')
-            ->add('vendrediApHd')
-            ->add('vendrediApHf')
+            ->add('redacteur', EntityType::class, [
+                'class' => Redacteur::class,
+                'choice_label' => 'id',
+                'required' => false,
+            ])
+            ->add('zonesClient', EntityType::class, [
+                'class' => ZonesClient::class,
+                'choice_label' => 'id',
+                'required' => true,
+            ])
+            ->add('contrat', EntityType::class, [
+                'class' => Contrat::class,
+                'choice_label' => 'id',
+                'required' => false,
+            ])
             ->add('elementSecurites', EntityType::class, [
                 'class' => ElementSecurite::class,
                 'choice_label' => 'id',
                 'multiple' => true,
-            ])
-            ->add('redacteur', EntityType::class, [
-                'class' => Redacteur::class,
-                'choice_label' => 'id',
+                'required' => false,
             ])
         ;
     }

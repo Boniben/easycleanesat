@@ -20,8 +20,8 @@
                 <td>{{ intervention.dateCreation ? intervention.dateCreation|date('Y-m-d') : '' }}</td>
             </tr>
             <tr>
-                <th>DateModification</th>
-                <td>{{ intervention.dateModification ? intervention.dateModification|date('Y-m-d') : '' }}</td>
+                <th>DateModificaion</th>
+                <td>{{ intervention.dateModificaion ? intervention.dateModificaion|date('Y-m-d') : '' }}</td>
             </tr>
             <tr>
                 <th>NbTravailleur</th>
@@ -36,84 +36,16 @@
                 <td>{{ intervention.dureeMinute }}</td>
             </tr>
             <tr>
-                <th>LundiMatHd</th>
-                <td>{{ intervention.lundiMatHd ? intervention.lundiMatHd|date('H:i:s') : '' }}</td>
+                <th>Redacteur</th>
+                <td>{{ intervention.redacteur ? intervention.redacteur.id : '' }}</td>
             </tr>
             <tr>
-                <th>LundiMatHf</th>
-                <td>{{ intervention.lundiMatHf ? intervention.lundiMatHf|date('H:i:s') : '' }}</td>
+                <th>ZonesClient</th>
+                <td>{{ intervention.zonesClient ? intervention.zonesClient.id : '' }}</td>
             </tr>
             <tr>
-                <th>LundiApHd</th>
-                <td>{{ intervention.lundiApHd ? intervention.lundiApHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>LundiApHf</th>
-                <td>{{ intervention.lundiApHf ? intervention.lundiApHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MardiMatHd</th>
-                <td>{{ intervention.mardiMatHd ? intervention.mardiMatHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MardiMatHf</th>
-                <td>{{ intervention.mardiMatHf ? intervention.mardiMatHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MardiApHd</th>
-                <td>{{ intervention.mardiApHd ? intervention.mardiApHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MardiApHf</th>
-                <td>{{ intervention.mardiApHf ? intervention.mardiApHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MercrediMatHd</th>
-                <td>{{ intervention.mercrediMatHd ? intervention.mercrediMatHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MercrediMatHf</th>
-                <td>{{ intervention.mercrediMatHf ? intervention.mercrediMatHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MercrediApHd</th>
-                <td>{{ intervention.mercrediApHd ? intervention.mercrediApHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>MercrediApHf</th>
-                <td>{{ intervention.mercrediApHf ? intervention.mercrediApHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>JeudiMatHd</th>
-                <td>{{ intervention.jeudiMatHd ? intervention.jeudiMatHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>JeudiMatHf</th>
-                <td>{{ intervention.jeudiMatHf ? intervention.jeudiMatHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>JeudiApHd</th>
-                <td>{{ intervention.jeudiApHd ? intervention.jeudiApHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>JeudiApHf</th>
-                <td>{{ intervention.jeudiApHf ? intervention.jeudiApHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>VendrediMatHd</th>
-                <td>{{ intervention.vendrediMatHd ? intervention.vendrediMatHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>VendrediMatHf</th>
-                <td>{{ intervention.vendrediMatHf ? intervention.vendrediMatHf|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>VendrediApHd</th>
-                <td>{{ intervention.vendrediApHd ? intervention.vendrediApHd|date('H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>VendrediApHf</th>
-                <td>{{ intervention.vendrediApHf ? intervention.vendrediApHf|date('H:i:s') : '' }}</td>
+                <th>Contrat</th>
+                <td>{{ intervention.contrat ? intervention.contrat.id : '' }}</td>
             </tr>
         </tbody>
     </table>
