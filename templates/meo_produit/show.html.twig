@@ -8,12 +8,56 @@
     <table class="table">
         <tbody>
             <tr>
-                <th>Id</th>
-                <td>{{ meo_produit.id }}</td>
+                <th>Code produit</th>
+                <td>{{ meo_produit.produit ? meo_produit.produit.code : '-' }}</td>
             </tr>
             <tr>
-                <th>VolumeProduit</th>
-                <td>{{ meo_produit.volumeProduit }}</td>
+                <th>Code contenant (ID)</th>
+                <td>{{ meo_produit.contenant ? meo_produit.contenant.id : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Code moyen dilution</th>
+                <td>{{ meo_produit.moyenDosage ? meo_produit.moyenDosage.code : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Nom produit</th>
+                <td>{{ meo_produit.produit ? meo_produit.produit.nom : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Couleur produit</th>
+                <td>{{ meo_produit.produit and meo_produit.produit.couleur ? meo_produit.produit.couleur : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Nom contenant</th>
+                <td>{{ meo_produit.contenant ? meo_produit.contenant.nom : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Volume eau contenant</th>
+                <td>{{ meo_produit.contenant and meo_produit.contenant.volumeEau is not null ? meo_produit.contenant.volumeEau : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Unite contenant</th>
+                <td>{{ meo_produit.contenant and meo_produit.contenant.uniteVolume ? meo_produit.contenant.uniteVolume.nom : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Volume produit</th>
+                <td>{{ meo_produit.volumeProduit is not null ? meo_produit.volumeProduit : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Unite volume produit</th>
+                <td>{{ meo_produit.uniteVolume ? meo_produit.uniteVolume.nom : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Moyen dilution</th>
+                <td>{{ meo_produit.moyenDosage ? meo_produit.moyenDosage.nom : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Temps contact (min)</th>
+                <td>{{ meo_produit.tempsContact ? meo_produit.tempsContact.tempsContact : '-' }}</td>
+            </tr>
+            <tr>
+                <th>Id MeoProduit</th>
+                <td>{{ meo_produit.id }}</td>
             </tr>
         </tbody>
     </table>
