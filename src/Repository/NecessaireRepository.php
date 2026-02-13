@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\Accessoire;
+use App\Entity\Necessaire;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Accessoire>
+ * @extends ServiceEntityRepository<Necessaire>
  */
-class AccessoireRepository extends ServiceEntityRepository
+class NecessaireRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Accessoire::class);
+        parent::__construct($registry, Necessaire::class);
     }
 
     //    /**
-    //     * @return Accessoire[] Returns an array of Accessoire objects
+    //     * @return Necessaire[] Returns an array of Necessaire objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
+    //        return $this->createQueryBuilder('n')
+    //            ->andWhere('n.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
+    //            ->orderBy('n.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Accessoire
+    //    public function findOneBySomeField($value): ?Necessaire
     //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
+    //        return $this->createQueryBuilder('n')
+    //            ->andWhere('n.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()
