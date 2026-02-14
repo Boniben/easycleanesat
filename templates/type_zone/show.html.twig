@@ -1,30 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Type de zone{% endblock %}
+{% block title %}Type de zone
+{% endblock %}
 
 {% block body %}
-    <h1>Type de zone</h1>
+	<h1>Type de zone</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ type_zone.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ type_zone.nom }}</td>
-            </tr>
-            <tr>
-                <th>Picto</th>
-                <td>{{ type_zone.picto }}</td>
-            </tr>
-        </tbody>
-    </table>
+	<p>
+		<strong>Nom :</strong>
+		{{ type_zone.nom }}</p>
+	<p>
+		<strong>Pictogramme :</strong>
+	</p>
+	{% if type_zone.picto %}
+		<img src="{{ asset('uploads/pictos/' ~ type_zone.picto) }}" alt="{{ type_zone.nom }}" width="100">
+	{% else %}
+		<p>Aucun pictogramme</p>
+	{% endif %}
 
-    <a href="{{ path('app_type_zone_index') }}">back to list</a>
-
-    <a href="{{ path('app_type_zone_edit', {'id': type_zone.id}) }}">edit</a>
-
-    {{ include('type_zone/_delete_form.html.twig') }}
+	<hr>
+	<a href="{{ path('app_type_zone_index') }}">Retour à la liste</a>
+	<a href="{{ path('app_type_zone_edit', {'id': type_zone.id}) }}">Modifier</a>
+	{{ include('type_zone/_delete_form.html.twig') }}
 {% endblock %}

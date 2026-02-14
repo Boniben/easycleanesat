@@ -1,11 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau type de zone{% endblock %}
+{% block title %}Ajouter un type de zone
+{% endblock %}
 
 {% block body %}
-    <h1>Nouveau type de zone</h1>
+	<h1>Ajouter un type de zone</h1>
 
-    {{ include('type_zone/_form.html.twig') }}
+	{{ include('type_zone/_form.html.twig') }}
 
-    <a href="{{ path('app_type_zone_index') }}">retour à la liste</a>
+	<a href="{{ path('app_type_zone_index') }}">Retour à la liste</a>
 {% endblock %}

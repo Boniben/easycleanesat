@@ -32,7 +32,6 @@ final class TypeZoneController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($typeZone);
             $entityManager->flush();
-
             return $this->redirectToRoute('app_type_zone_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -58,7 +57,6 @@ final class TypeZoneController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->redirectToRoute('app_type_zone_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -71,11 +69,10 @@ final class TypeZoneController extends AbstractController
     #[Route('/{id}', name: 'app_type_zone_delete', methods: ['POST'])]
     public function delete(Request $request, TypeZone $typeZone, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$typeZone->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $typeZone->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($typeZone);
             $entityManager->flush();
         }
-
         return $this->redirectToRoute('app_type_zone_index', [], Response::HTTP_SEE_OTHER);
     }
 }
