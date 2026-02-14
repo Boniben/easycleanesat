@@ -18,12 +18,6 @@ class TypeSupport
     #[ORM\Column(length: 50)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $picto = null;
-
-    /**
-     * @var Collection<int, SupportClient>
-     */
     #[ORM\OneToMany(targetEntity: SupportClient::class, mappedBy: 'typeSupport', orphanRemoval: true)]
     private Collection $supportClients;
 
@@ -45,25 +39,9 @@ class TypeSupport
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
-    public function getPicto(): ?string
-    {
-        return $this->picto;
-    }
-
-    public function setPicto(string $picto): static
-    {
-        $this->picto = $picto;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SupportClient>
-     */
     public function getSupportClients(): Collection
     {
         return $this->supportClients;
@@ -75,19 +53,21 @@ class TypeSupport
             $this->supportClients->add($supportClient);
             $supportClient->setTypeSupport($this);
         }
-
         return $this;
     }
 
     public function removeSupportClient(SupportClient $supportClient): static
     {
         if ($this->supportClients->removeElement($supportClient)) {
-            // set the owning side to null (unless already changed)
             if ($supportClient->getTypeSupport() === $this) {
                 $supportClient->setTypeSupport(null);
             }
         }
-
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->nom ?? '';
     }
 }

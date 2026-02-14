@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche -
+	{{ query }}
+{% endblock %}
+
+{% block body %}
+	<h1>Résultats de recherche pour "{{ query }}"</h1>
+
+	{% if query == '' %}
+		<p>Veuillez saisir un terme de recherche.</p>
+	{% else %}
+
+		{# --- Clients --- #}
+		{% if results.clients is not empty %}
+			<h2>Clients</h2>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Nom client</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for client in results.clients %}
+						<tr>
+							<td>{{ client.nom }}</td>
+							<td>
+								<a href="{{ path('app_client_show', {'id': client.id}) }}" class="btn btn-primary">Consulter</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+
+		{# --- Sites --- #}
+		{% if results.sites is not empty %}
+			<h2>Sites clients</h2>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Nom site</th>
+						<th>Client</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for site in results.sites %}
+						<tr>
+							<td>{{ site.nom }}</td>
+							<td>{{ site.client.nom }}</td>
+							<td>
+								<a href="{{ path('app_client_show', {'id': site.client.id}) }}" class="btn btn-primary">Consulter le client</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+
+		{# --- Zones --- #}
+		{% if results.zones is not empty %}
+			<h2>Zones clients</h2>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Nom zone</th>
+						<th>Site</th>
+						<th>Client</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for zone in results.zones %}
+						<tr>
+							<td>{{ zone.nom }}</td>
+							<td>{{ zone.sitesClient.nom }}</td>
+							<td>{{ zone.sitesClient.client.nom }}</td>
+							<td>
+								<a href="{{ path('app_client_show', {'id': zone.sitesClient.client.id}) }}" class="btn btn-primary">Consulter le client</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+
+		{# --- Contrats --- #}
+		{% if results.contrats is not empty %}
+			<h2>Contrats</h2>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Numéro</th>
+						<th>Site</th>
+						<th>Client</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for contrat in results.contrats %}
+						<tr>
+							<td>{{ contrat.numero }}</td>
+							<td>{{ contrat.sitesClient.nom }}</td>
+							<td>{{ contrat.sitesClient.client.nom }}</td>
+							<td>
+								<a href="{{ path('app_contrat_show', {'id': contrat.id}) }}" class="btn btn-primary">Consulter le contrat</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+
+		{# --- Aucun résultat --- #}
+		{% if results.clients is empty and results.sites is empty and results.zones is empty and results.contrats is empty %}
+			<div class="alert alert-info">
+				Aucun résultat trouvé pour "{{ query }}".
+			</div>
+		{% endif %}
+
+	{% endif %}
+{% endblock %}

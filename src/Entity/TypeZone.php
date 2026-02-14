@@ -18,12 +18,6 @@ class TypeZone
     #[ORM\Column(length: 50)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $picto = null;
-
-    /**
-     * @var Collection<int, ZonesClient>
-     */
     #[ORM\OneToMany(targetEntity: ZonesClient::class, mappedBy: 'typeZone')]
     private Collection $zonesClients;
 
@@ -45,25 +39,9 @@ class TypeZone
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
-    public function getPicto(): ?string
-    {
-        return $this->picto;
-    }
-
-    public function setPicto(string $picto): static
-    {
-        $this->picto = $picto;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ZonesClient>
-     */
     public function getZonesClients(): Collection
     {
         return $this->zonesClients;
@@ -75,19 +53,21 @@ class TypeZone
             $this->zonesClients->add($zonesClient);
             $zonesClient->setTypeZone($this);
         }
-
         return $this;
     }
 
     public function removeZonesClient(ZonesClient $zonesClient): static
     {
         if ($this->zonesClients->removeElement($zonesClient)) {
-            // set the owning side to null (unless already changed)
             if ($zonesClient->getTypeZone() === $this) {
                 $zonesClient->setTypeZone(null);
             }
         }
-
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->nom ?? '';
     }
 }
