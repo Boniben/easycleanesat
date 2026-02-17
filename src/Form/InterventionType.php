@@ -9,6 +9,8 @@ use App\Entity\Redacteur;
 use App\Entity\ZonesClient;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,30 +19,57 @@ class InterventionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('numVersion')
-            ->add('dateCreation')
-            ->add('dateModificaion')
-            ->add('nbTravailleur')
-            ->add('dureeHeure')
-            ->add('dureeMinute')
-            ->add('redacteur', EntityType::class, [
-                'class' => Redacteur::class,
-                'choice_label' => 'id',
-                'required' => false,
-            ])
             ->add('zonesClient', EntityType::class, [
                 'class' => ZonesClient::class,
-                'choice_label' => 'id',
+                'choice_label' => function (ZonesClient $zone) {
+                    $siteName = $zone->getSitesClient() ? $zone->getSitesClient()->getNom() : 'N/A';
+                    $clientName = $zone->getSitesClient() && $zone->getSitesClient()->getClient() 
+                        ? $zone->getSitesClient()->getClient()->getNom() 
+                        : 'N/A';
+                    return $clientName . ' - ' . $siteName . ' - ' . $zone->getNom();
+                },
+                'placeholder' => 'Sélectionnez une zone (Client - Site - Zone)',
                 'required' => true,
             ])
             ->add('contrat', EntityType::class, [
                 'class' => Contrat::class,
-                'choice_label' => 'id',
+                'choice_label' => function (Contrat $contrat) {
+                    $siteName = $contrat->getSitesClient() ? $contrat->getSitesClient()->getNom() : 'N/A';
+                    return $contrat->getNumero() . ' (' . $siteName . ')';
+                },
+                'placeholder' => 'Sélectionnez un contrat',
                 'required' => false,
             ])
+            ->add('redacteur', EntityType::class, [
+                'class' => Redacteur::class,
+                'choice_label' => 'initial',
+                'placeholder' => 'Sélectionnez un rédacteur',
+                'required' => false,
+            ])
+            ->add('numVersion')
+            ->add('dateCreation', DateType::class, [
+                'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'attr' => ['placeholder' => 'jj/mm/aaaa'],
+            ])
+            ->add('dateModificaion', DateType::class, [
+                'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'attr' => ['placeholder' => 'jj/mm/aaaa'],
+            ])
+            ->add('nbTravailleur', IntegerType::class, [
+                'attr' => [
+                    'min' => 1,
+                    'max' => 6,
+                ],
+            ])
+            ->add('dureeHeure')
+            ->add('dureeMinute')
             ->add('elementSecurites', EntityType::class, [
                 'class' => ElementSecurite::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
                 'multiple' => true,
                 'required' => false,
             ])
