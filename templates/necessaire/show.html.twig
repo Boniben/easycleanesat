@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Necessaire{% endblock %}
+
+{% block body %}
+    <h1>Necessaire</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ necessaire.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ necessaire.nom }}</td>
+            </tr>
+            <tr>
+                <th>Code</th>
+                <td>{{ necessaire.code }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ necessaire.type }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_necessaire_index') }}">back to list</a>
+
+    <a href="{{ path('app_necessaire_edit', {'id': necessaire.id}) }}">edit</a>
+
+    {{ include('necessaire/_delete_form.html.twig') }}
+{% endblock %}

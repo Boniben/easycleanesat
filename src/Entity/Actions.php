@@ -19,7 +19,7 @@ class Actions
     private ?MeoProduit $meo_produit = null;
 
     #[ORM\ManyToOne(inversedBy: 'actions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Intervention $intervention = null;
 
     /**
