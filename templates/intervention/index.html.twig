@@ -35,8 +35,8 @@
                 <td>{{ intervention.zonesClient ? intervention.zonesClient.id : '' }}</td>
                 <td>{{ intervention.contrat ? intervention.contrat.id : '' }}</td>
                 <td>
-                    <a href="{{ path('app_intervention_show', {'id': intervention.id}) }}">show</a>
-                    <a href="{{ path('app_intervention_edit', {'id': intervention.id}) }}">edit</a>
+                    <a href="{{ path('app_intervention_show', {'id': intervention.id}) }}">afficher</a>
+                    <a href="{{ path('app_intervention_edit', {'id': intervention.id}) }}">modifier</a>
                 </td>
             </tr>
         {% else %}
