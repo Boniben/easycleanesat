@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Actions{% endblock %}
+
+{% block body %}
+    <h1>Actions</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ action.id }}</td>
+            </tr>
+            <tr>
+                <th>Meo Produit</th>
+                <td>{{ action.meoProduit ? action.meoProduit.id : '' }}</td>
+            </tr>
+            <tr>
+                <th>Interventions</th>
+                <td>
+                    {% if action.interventions is not empty %}
+                        <ul>
+                            {% for intervention in action.interventions %}
+                                <li>
+                                    <a href="{{ path('app_intervention_show', {'id': intervention.id}) }}">
+                                        Intervention #{{ intervention.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        Aucune intervention
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Necessaires</th>
+                <td>
+                    {% if action.necessaire is not empty %}
+                        <ul>
+                            {% for nec in action.necessaire %}
+                                <li>{{ nec.id }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        Aucun necessaire
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_actions_index') }}">back to list</a>
+
+    <a href="{{ path('app_actions_edit', {'id': action.id}) }}">edit</a>
+
+    {{ include('actions/_delete_form.html.twig') }}
+{% endblock %}

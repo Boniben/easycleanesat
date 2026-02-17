@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Necessaire index{% endblock %}
+
+{% block body %}
+    <h1>Necessaire index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Code</th>
+                <th>Type</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for necessaire in necessaires %}
+            <tr>
+                <td>{{ necessaire.id }}</td>
+                <td>{{ necessaire.nom }}</td>
+                <td>{{ necessaire.code }}</td>
+                <td>{{ necessaire.type }}</td>
+                <td>
+                    <a href="{{ path('app_necessaire_show', {'id': necessaire.id}) }}">show</a>
+                    <a href="{{ path('app_necessaire_edit', {'id': necessaire.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_necessaire_new') }}">Create new</a>
+{% endblock %}
