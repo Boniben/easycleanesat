@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block body %}
+    <section class="dashboard-hero">
+        <h1>Dashboard Administrateur</h1>
+        <p>Acces rapide aux actions principales de l'application.</p>
+    </section>
+
+    <section class="dashboard-actions">
+        <a class="dashboard-action" href="{{ path('app_client_index') }}">
+            <strong>Liste des clients</strong>
+            <span>Consulter et gerer les utilisateurs.</span>
+        </a>
+        <a class="dashboard-action" href="{{ path('app_contrat_index') }}">
+            <strong>Gestion des contrats</strong>
+            <span>Consulter et gerer les contrats.</span>
+        </a>
+        <a class="dashboard-action" href="{{ path('app_intervention_index') }}">
+            <strong>Gestion des interventions</strong>
+            <span>Consulter et gerer les interventions.</span>
+        </a>
+        <a class="dashboard-action" href="{{ path('app_produit_index') }}">
+            <strong>Gestion des produits</strong>
+            <span>Consulter et gerer les produits.</span>
+        </a>
+        <a class="dashboard-action" href="{{ path('app_sites_client_index') }}">
+            <strong>Gestion des sites clients</strong>
+            <span>Consulter et gerer les sites clients.</span>
+        </a>
+        <a class="dashboard-action" href="{{ path('app_element_securite_index') }}">
+            <strong>Elements de securite</strong>
+            <span>Gerer les elements de securite.</span>
+        </a>
+        <a class="dashboard-action" href="{{ path('app_vigilance_index') }}">
+            <strong>Gestion de la vigilance</strong>
+            <span>Consulter et gerer la vigilance.</span>
+        </a>
+        <a class="dashboard-action" href="{{ path('app_logout') }}">
+            <strong>Deconnexion</strong>
+            <span>Se deconnecter de l'interface admin.</span>
+        </a>
+    </section>
+{% endblock %}
