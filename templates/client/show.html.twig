@@ -24,12 +24,14 @@
 			<div class="card-header">
 				<h2>{{ site.nom }}</h2>
 				<div class="btn-group">
+					<a href="{{ path('app_zones_client_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Zone</a>
 					{% if is_granted('ROLE_ADMIN') %}
 						<a href="{{ path('app_contrat_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Contrat</a>
 					{% endif %}
 				</div>
 			</div>
 
+			<h3>Contrats</h3>
 			{% if site.contrats|length > 0 %}
 				<ul class="info-list">
 					{% for contrat in site.contrats %}
@@ -41,6 +43,22 @@
 				</ul>
 			{% else %}
 				<p class="text-muted text-sm">Aucun contrat pour ce site</p>
+			{% endif %}
+
+			<hr>
+
+			<h3>Zones</h3>
+			{% if site.zonesClients|length > 0 %}
+				<ul class="info-list">
+					{% for zone in site.zonesClients %}
+						<li>
+							<span class="info-label">{{ zone.typeZone }}</span>
+							<a href="{{ path('app_zones_client_show', {'id': zone.id}) }}">{{ zone.nom }}</a>
+						</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<p class="text-muted text-sm">Aucune zone pour ce site</p>
 			{% endif %}
 		</div>
 	{% else %}
