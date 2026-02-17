@@ -21,7 +21,7 @@
                 <td>{{ necessaire.id }}</td>
                 <td>{{ necessaire.nom }}</td>
                 <td>{{ necessaire.code }}</td>
-                <td>{{ necessaire.type }}</td>
+                <td>{{ necessaire.typeNecessaire ? necessaire.typeNecessaire.nom : '' }}</td>
                 <td>
                     <a href="{{ path('app_necessaire_show', {'id': necessaire.id}) }}">show</a>
                     <a href="{{ path('app_necessaire_edit', {'id': necessaire.id}) }}">edit</a>

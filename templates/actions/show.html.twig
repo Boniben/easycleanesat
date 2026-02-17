@@ -18,12 +18,12 @@
             <tr>
                 <th>Interventions</th>
                 <td>
-                    {% if action.interventions is not empty %}
+                    {% if action.intervention is not empty %}
                         <ul>
-                            {% for intervention in action.interventions %}
+                            {% for inter in action.intervention %}
                                 <li>
-                                    <a href="{{ path('app_intervention_show', {'id': intervention.id}) }}">
-                                        Intervention #{{ intervention.id }}
+                                    <a href="{{ path('app_intervention_show', {'id': inter.id}) }}">
+                                        Intervention #{{ inter.id }}
                                     </a>
                                 </li>
                             {% endfor %}

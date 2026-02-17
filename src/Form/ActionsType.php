@@ -20,7 +20,7 @@ class ActionsType extends AbstractType
                 'class' => MeoProduit::class,
                 'choice_label' => 'id',
             ])
-            ->add('interventions', EntityType::class, [
+            ->add('intervention', EntityType::class, [
                 'class' => Intervention::class,
                 'choice_label' => 'id',
                 'multiple' => true,

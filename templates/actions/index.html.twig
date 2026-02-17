@@ -20,8 +20,8 @@
                 <td>{{ action.id }}</td>
                 <td>{{ action.meoProduit ? action.meoProduit.id : '' }}</td>
                 <td>
-                    {% if action.interventions is not empty %}
-                        {{ action.interventions|length }} intervention(s)
+                    {% if action.intervention is not empty %}
+                        {{ action.intervention|length }} intervention(s)
                     {% else %}
                         -
                     {% endif %}

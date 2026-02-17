@@ -21,14 +21,15 @@ class Necessaire
     #[ORM\Column(length: 50)]
     private ?string $code = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $type = null;
-
     /**
      * @var Collection<int, Actions>
      */
     #[ORM\ManyToMany(targetEntity: Actions::class, mappedBy: 'necessaire')]
     private Collection $actions;
+
+    #[ORM\ManyToOne(inversedBy: 'necessaires')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypeNecessaire $type_necessaire = null;
 
     public function __construct()
     {
@@ -64,18 +65,6 @@ class Necessaire
         return $this;
     }
 
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Actions>
      */
@@ -99,6 +88,18 @@ class Necessaire
         if ($this->actions->removeElement($action)) {
             $action->removeNecessaire($this);
         }
+
+        return $this;
+    }
+
+    public function getTypeNecessaire(): ?TypeNecessaire
+    {
+        return $this->type_necessaire;
+    }
+
+    public function setTypeNecessaire(?TypeNecessaire $type_necessaire): static
+    {
+        $this->type_necessaire = $type_necessaire;
 
         return $this;
     }
