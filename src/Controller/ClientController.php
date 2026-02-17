@@ -39,7 +39,7 @@ final class ClientController extends AbstractController
         return $this->render('client/new.html.twig', [
             'client' => $client,
             'form' => $form,
-        ]);
+        ]);/**   */ 
     }
 
     #[Route('/{id}', name: 'app_client_show', methods: ['GET'])]
