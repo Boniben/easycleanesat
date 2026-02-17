@@ -1,4 +1,47 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+    {{ form_row(form.client) }}
+    {{ form_row(form.site) }}
+    {{ form_row(form.contrat) }}
+    {{ form_row(form.zonesClient) }}
+    {{ form_row(form.redacteur) }}
+    {{ form_row(form.dateCreation) }}
+    {{ form_row(form.nbTravailleur) }}
+    
+    <div class="form-group">
+        <label>Durée</label>
+        <div class="duree-container">
+            {{ form_widget(form.dureeHeure, {'attr': {'class': 'duree-input'}}) }}
+            <span class="duree-separator">:</span>
+            {{ form_widget(form.dureeMinute, {'attr': {'class': 'duree-input'}}) }}
+        </div>
+        {{ form_errors(form.dureeHeure) }}
+        {{ form_errors(form.dureeMinute) }}
+    </div>
+    
+    {{ form_row(form.elementSecurites) }}
+    
     <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
+
+<style>
+.duree-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.duree-input {
+    width: 80px;
+    padding: 8px;
+    font-size: 1.2em;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.duree-separator {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+}
+</style>

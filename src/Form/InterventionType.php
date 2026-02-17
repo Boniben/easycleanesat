@@ -22,10 +22,7 @@ class InterventionType extends AbstractType
             ->add('client', EntityType::class, [
                 'class' => ZonesClient::class,
                 'choice_label' => function (ZonesClient $client) {
-                    return $clientName = $client->getSitesClient() && $client->getSitesClient()->getClient() 
-                        ? $client->getSitesClient()->getClient()->getNom() 
-                        : 'N/A';    
-                // return $client->getNom();
+                    return $clientName = $client->getSitesClient() && $client->getSitesClient()->getClient() ? $client->getSitesClient()->getClient()->getNom() : 'N/A';    
                 },
                 'placeholder' => 'Sélectionnez un client',
                 'mapped' => false, 
@@ -40,6 +37,15 @@ class InterventionType extends AbstractType
                 'mapped' => false, 
                 'required' => true,
             ])
+            ->add('contrat', EntityType::class, [
+                'class' => Contrat::class,
+                'choice_label' => function (Contrat $contrat) {
+                    $siteName = $contrat->getSitesClient() ? $contrat->getSitesClient()->getNom() : 'N/A';
+                    return $contrat->getNumero();
+                },
+                'placeholder' => 'Sélectionnez un contrat',
+                'required' => false,
+            ])
             ->add('zonesClient', EntityType::class, [
                 'class' => ZonesClient::class,
                 'choice_label' => function (ZonesClient $zone) {
@@ -49,29 +55,13 @@ class InterventionType extends AbstractType
                 'placeholder' => 'Sélectionnez une zone',
                 'required' => true,
             ])
-            ->add('contrat', EntityType::class, [
-                'class' => Contrat::class,
-                'choice_label' => function (Contrat $contrat) {
-                    $siteName = $contrat->getSitesClient() ? $contrat->getSitesClient()->getNom() : 'N/A';
-                    return $contrat->getNumero() . ' (' . $siteName . ')';
-                },
-                'placeholder' => 'Sélectionnez un contrat',
-                'required' => false,
-            ])
             ->add('redacteur', EntityType::class, [
                 'class' => Redacteur::class,
                 'choice_label' => 'initial',
                 'placeholder' => 'Sélectionnez un rédacteur',
                 'required' => false,
             ])
-            ->add('numVersion')
             ->add('dateCreation', DateType::class, [
-                'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'attr' => ['placeholder' => 'jj/mm/aaaa'],
-            ])
-            ->add('dateModificaion', DateType::class, [
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
                 'html5' => false,
