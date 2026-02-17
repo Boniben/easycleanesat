@@ -35,12 +35,6 @@ class Intervention
     #[ORM\JoinColumn(nullable: false)]
     private ?ZonesClient $zonesClient = null;
 
-    /**
-     * @var Collection<int, Actions>
-     */
-    #[ORM\OneToMany(targetEntity: Actions::class, mappedBy: 'intervention')]
-    private Collection $actions;
-
     #[ORM\Column(nullable: true)]
     private ?int $numVersion = null;
 
@@ -68,12 +62,18 @@ class Intervention
     #[ORM\OneToMany(targetEntity: Plage::class, mappedBy: 'intervention')]
     private Collection $plages;
 
+    /**
+     * @var Collection<int, Actions>
+     */
+    #[ORM\ManyToMany(targetEntity: Actions::class, mappedBy: 'intervention')]
+    private Collection $actions;
+
     public function __construct()
     {
         $this->elementSecurites = new ArrayCollection();
         $this->vigilanceInterventions = new ArrayCollection();
-        $this->actions = new ArrayCollection();
         $this->plages = new ArrayCollection();
+        $this->actions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,36 +158,6 @@ class Intervention
     public function setZonesClient(?ZonesClient $zonesClient): static
     {
         $this->zonesClient = $zonesClient;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Actions>
-     */
-    public function getActions(): Collection
-    {
-        return $this->actions;
-    }
-
-    public function addAction(Actions $action): static
-    {
-        if (!$this->actions->contains($action)) {
-            $this->actions->add($action);
-            $action->setIntervention($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAction(Actions $action): static
-    {
-        if ($this->actions->removeElement($action)) {
-            // set the owning side to null (unless already changed)
-            if ($action->getIntervention() === $this) {
-                $action->setIntervention(null);
-            }
-        }
 
         return $this;
     }
@@ -301,6 +271,33 @@ class Intervention
             if ($plage->getIntervention() === $this) {
                 $plage->setIntervention(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Actions>
+     */
+    public function getActions(): Collection
+    {
+        return $this->actions;
+    }
+
+    public function addAction(Actions $action): static
+    {
+        if (!$this->actions->contains($action)) {
+            $this->actions->add($action);
+            $action->addIntervention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAction(Actions $action): static
+    {
+        if ($this->actions->removeElement($action)) {
+            $action->removeIntervention($this);
         }
 
         return $this;
