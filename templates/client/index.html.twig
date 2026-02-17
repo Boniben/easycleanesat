@@ -6,10 +6,12 @@
 {% block body %}
 	<div class="page-header">
 		<h1>Liste des clients</h1>
-		<a href="{{ path('app_client_new') }}" class="btn btn-primary">+ Ajouter un client</a>
+		{% if is_granted('ROLE_ADMIN') %}
+			<a href="{{ path('app_client_new') }}" class="btn btn-primary">+ Ajouter un client</a>
+		{% endif %}
 	</div>
 
-	<div class="table-wrapper" style="max-width: 500px;">
+	<div class="table-wrapper" style="max-width: 480px;">
 		<table>
 			<thead>
 				<tr>

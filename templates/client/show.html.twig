@@ -9,64 +9,13 @@
 	<div class="page-header">
 		<div>
 			<h1>{{ client.nom }}</h1>
-			<p class="page-subtitle">Détail du client et de ses sites</p>
-		</div>
-		<div class="btn-group">
-			<a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}" class="btn btn-primary">+ Ajouter un site</a>
-			<a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-secondary">Modifier le client</a>
-		</div>
-	</div>
-
-	{% for site in client.sitesClients %}
-		<div class="card">
-			<div class="card-header">
-				<h2>{{ site.nom }}</h2>
-				<a href="{{ path('app_contrat_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Ajouter un contrat</a>
-			</div>
-
-			{% if site.contrats|length > 0 %}
-				<ul class="info-list">
-					{% for contrat in site.contrats %}
-						<li>
-							<span class="info-label">Contrat :</span>
-							<a href="{{ path('app_contrat_show', {'id': contrat.id}) }}">{{ contrat.numero }}</a>
-						</li>
-					{% endfor %}
-				</ul>
-			{% else %}
-				<p class="text-muted text-sm">Aucun contrat pour ce site</p>
-			{% endif %}
-		</div>
-	{% else %}
-		<div class="card">
-			<div class="empty-state">
-				<p>Aucun site pour ce client</p>
-				<a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}" class="btn btn-primary">Créer le premier site</a>
-			</div>
-		</div>
-	{% endfor %}
-
-	<div class="btn-group mt-3">
-		<a href="{{ path('app_client_index') }}" class="btn btn-secondary">← Retour à la liste</a>
-		{{ include('client/_delete_form.html.twig') }}
-	</div>
-{% endblock %}
-{% extends 'base.html.twig' %}
-
-{% block title %}
-	{{ client.nom }}
-	— Consulter
-{% endblock %}
-
-{% block body %}
-	<div class="page-header">
-		<div>
-			<h1>{{ client.nom }}</h1>
 			<p class="text-muted text-sm">Détail du client et de ses sites</p>
 		</div>
 		<div class="btn-group">
-			<a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}" class="btn btn-primary">+ Ajouter un site</a>
-			<a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-secondary">Modifier</a>
+			{% if is_granted('ROLE_ADMIN') %}
+				<a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}" class="btn btn-primary">+ Ajouter un site</a>
+				<a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-secondary">Modifier</a>
+			{% endif %}
 		</div>
 	</div>
 
@@ -74,7 +23,11 @@
 		<div class="card">
 			<div class="card-header">
 				<h2>{{ site.nom }}</h2>
-				<a href="{{ path('app_contrat_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Contrat</a>
+				<div class="btn-group">
+					{% if is_granted('ROLE_ADMIN') %}
+						<a href="{{ path('app_contrat_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Contrat</a>
+					{% endif %}
+				</div>
 			</div>
 
 			{% if site.contrats|length > 0 %}
@@ -94,13 +47,14 @@
 		<div class="card">
 			<div class="empty-state">
 				<p>Aucun site pour ce client</p>
-				<a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}" class="btn btn-primary">Créer le premier site</a>
 			</div>
 		</div>
 	{% endfor %}
 
 	<div class="btn-group mt-3">
 		<a href="{{ path('app_client_index') }}" class="btn btn-secondary">← Retour à la liste</a>
-		{{ include('client/_delete_form.html.twig') }}
+		{% if is_granted('ROLE_ADMIN') %}
+			{{ include('client/_delete_form.html.twig') }}
+		{% endif %}
 	</div>
 {% endblock %}
