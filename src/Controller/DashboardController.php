@@ -13,7 +13,7 @@ final class DashboardController extends AbstractController
     #[Route('/', name: 'app_dashboard', methods: ['GET'])]
     public function index(): Response
     {
-        if($this->isGranted('ROLE_USER')) {
+        if($this->isGranted('ROLE_ADMIN')) {
             return $this->render('dashboard/admin_index.html.twig');
         }
         return $this->render('dashboard/index.html.twig');
