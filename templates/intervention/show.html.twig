@@ -47,6 +47,24 @@
                 <th>Contrat</th>
                 <td>{{ intervention.contrat ? intervention.contrat.id : '' }}</td>
             </tr>
+            <tr>
+                <th>Actions</th>
+                <td>
+                    {% if intervention.actions is not empty %}
+                        <ul>
+                            {% for action in intervention.actions %}
+                                <li>
+                                    <a href="{{ path('app_actions_show', {'id': action.id}) }}">
+                                        Action #{{ action.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        Aucune action
+                    {% endif %}
+                </td>
+            </tr>
         </tbody>
     </table>
 
