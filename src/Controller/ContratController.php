@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/contrat')]
 final class ContratController extends AbstractController
@@ -22,7 +23,7 @@ final class ContratController extends AbstractController
             'contrats' => $contratRepository->findAll(),
         ]);
     }
-
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new/{site_id}', name: 'app_contrat_new', methods: ['GET', 'POST'], defaults: ['site_id' => null])]
     public function new(Request $request, EntityManagerInterface $entityManager, ?int $site_id = null): Response
     {
@@ -58,7 +59,7 @@ final class ContratController extends AbstractController
             'contrat' => $contrat,
         ]);
     }
-
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/edit', name: 'app_contrat_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Contrat $contrat, EntityManagerInterface $entityManager): Response
     {
@@ -75,12 +76,12 @@ final class ContratController extends AbstractController
             'form' => $form,
         ]);
     }
-
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_contrat_delete', methods: ['POST'])]
     public function delete(Request $request, Contrat $contrat, EntityManagerInterface $entityManager): Response
     {
         $clientId = $contrat->getSitesClient()->getClient()->getId();
-        if ($this->isCsrfTokenValid('delete'.$contrat->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $contrat->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($contrat);
             $entityManager->flush();
         }
