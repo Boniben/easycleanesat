@@ -19,16 +19,34 @@ class InterventionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('client', EntityType::class, [
+                'class' => ZonesClient::class,
+                'choice_label' => function (ZonesClient $client) {
+                    return $clientName = $client->getSitesClient() && $client->getSitesClient()->getClient() 
+                        ? $client->getSitesClient()->getClient()->getNom() 
+                        : 'N/A';    
+                // return $client->getNom();
+                },
+                'placeholder' => 'Sélectionnez un client',
+                'mapped' => false, 
+                'required' => true,
+            ])
+            ->add('site', EntityType::class, [
+                'class' => ZonesClient::class,
+                'choice_label' => function (ZonesClient $site) {
+                    return $siteName = $site->getSitesClient() ? $site->getSitesClient()->getNom() : 'N/A';
+                },
+                'placeholder' => 'Sélectionnez un site',
+                'mapped' => false, 
+                'required' => true,
+            ])
             ->add('zonesClient', EntityType::class, [
                 'class' => ZonesClient::class,
                 'choice_label' => function (ZonesClient $zone) {
                     $siteName = $zone->getSitesClient() ? $zone->getSitesClient()->getNom() : 'N/A';
-                    $clientName = $zone->getSitesClient() && $zone->getSitesClient()->getClient() 
-                        ? $zone->getSitesClient()->getClient()->getNom() 
-                        : 'N/A';
-                    return $clientName . ' - ' . $siteName . ' - ' . $zone->getNom();
+                    return $zone->getNom();
                 },
-                'placeholder' => 'Sélectionnez une zone (Client - Site - Zone)',
+                'placeholder' => 'Sélectionnez une zone',
                 'required' => true,
             ])
             ->add('contrat', EntityType::class, [
