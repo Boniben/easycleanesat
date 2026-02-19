@@ -25,34 +25,10 @@ class SearchController extends AbstractController
         $results = [];
 
         if ($query !== '') {
-            $results['clients'] = $clientRepository->createQueryBuilder('c')
-                ->where('c.nom LIKE :q')
-                ->setParameter('q', '%' . $query . '%')
-                ->getQuery()
-                ->getResult();
-
-            $results['sites'] = $sitesClientRepository->createQueryBuilder('s')
-                ->leftJoin('s.client', 'c')
-                ->where('s.nom LIKE :q')
-                ->setParameter('q', '%' . $query . '%')
-                ->getQuery()
-                ->getResult();
-
-            $results['zones'] = $zonesClientRepository->createQueryBuilder('z')
-                ->leftJoin('z.sitesClient', 's')
-                ->leftJoin('s.client', 'c')
-                ->where('z.nom LIKE :q')
-                ->setParameter('q', '%' . $query . '%')
-                ->getQuery()
-                ->getResult();
-
-            $results['contrats'] = $contratRepository->createQueryBuilder('co')
-                ->leftJoin('co.sitesClient', 's')
-                ->leftJoin('s.client', 'c')
-                ->where('co.numero LIKE :q')
-                ->setParameter('q', '%' . $query . '%')
-                ->getQuery()
-                ->getResult();
+            $results['clients'] = $clientRepository->searchByNom($query);
+            $results['sites'] = $sitesClientRepository->searchByNom($query);
+            $results['zones'] = $zonesClientRepository->searchByNom($query);
+            $results['contrats'] = $contratRepository->searchByNumero($query);
         }
 
         return $this->render('search/index.html.twig', [

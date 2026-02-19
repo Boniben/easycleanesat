@@ -1,26 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Zones Client{% endblock %}
+{% block title %}Zone —
+	{{ zones_client.nom }}
+{% endblock %}
 
 {% block body %}
-    <h1>Zones Client</h1>
+	<div class="page-header">
+		<div>
+			<h1>{{ zones_client.nom }}</h1>
+			<p class="text-muted text-sm">{{ zones_client.sitesClient.client.nom }}
+				—
+				{{ zones_client.sitesClient.nom }}</p>
+		</div>
+		<div class="btn-group">
+			<a href="{{ path('app_support_client_new', {'zone_id': zones_client.id}) }}" class="btn btn-primary">Ajouter un support</a>
+			<a href="{{ path('app_zones_client_edit', {'id': zones_client.id}) }}" class="btn btn-secondary">Modifier</a>
+		</div>
+	</div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ zones_client.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ zones_client.nom }}</td>
-            </tr>
-        </tbody>
-    </table>
+	<div class="card">
+		<ul class="info-list">
+			<li>
+				<span class="info-label">Type de zone :</span>
+				<span>{{ zones_client.typeZone ? zones_client.typeZone.nom : 'Sans type' }}</span>
+			</li>
+			<li>
+				<span class="info-label">Site :</span>
+				<span>{{ zones_client.sitesClient.nom }}</span>
+			</li>
+			<li>
+				<span class="info-label">Client :</span>
+				<a href="{{ path('app_client_show', {'id': zones_client.sitesClient.client.id}) }}">{{ zones_client.sitesClient.client.nom }}</a>
+			</li>
+		</ul>
 
-    <a href="{{ path('app_zones_client_index') }}">retour à la liste</a>
+		<hr>
 
-    <a href="{{ path('app_zones_client_edit', {'id': zones_client.id}) }}"></a>
+		<h3>Supports</h3>
+		{% if zones_client.supportClients|length > 0 %}
+			<ul class="info-list">
+				{% for support in zones_client.supportClients %}
+					<li>
+						<span class="info-label">Support :</span>
+						<span>{{ support.typeSupport.nom }}</span>
+					</li>
+				{% endfor %}
+			</ul>
+		{% else %}
+			<p class="text-muted text-sm">Aucun support pour cette zone</p>
+		{% endif %}
+	</div>
 
-    {{ include('zones_client/_delete_form.html.twig') }}
+	<div class="btn-group mt-3">
+		<a href="{{ path('app_client_show', {'id': zones_client.sitesClient.client.id}) }}" class="btn btn-secondary">← Retour au client</a>
+		{{ include('zones_client/_delete_form.html.twig') }}
+	</div>
 {% endblock %}

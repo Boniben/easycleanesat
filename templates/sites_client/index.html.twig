@@ -1,35 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sites Client index{% endblock %}
+{% block title %}Liste des sites
+{% endblock %}
 
 {% block body %}
-    <h1>SitesClient index</h1>
+	<div class="page-header">
+		<h1>Liste des sites</h1>
+		{% if app.user and is_granted('ROLE_ADMIN') %}
+			<a href="{{ path('app_sites_client_new') }}" class="btn btn-primary">+ Ajouter un site</a>
+		{% endif %}
+	</div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for sites_client in sites_clients %}
-            <tr>
-                <td>{{ sites_client.id }}</td>
-                <td>{{ sites_client.nom }}</td>
-                <td>
-                    <a href="{{ path('app_sites_client_show', {'id': sites_client.id}) }}">show</a>
-                    <a href="{{ path('app_sites_client_edit', {'id': sites_client.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_sites_client_new') }}">Create new</a>
+	<div class="table-wrapper">
+		<table>
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Nom</th>
+					<th>Client</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for site in sites_clients %}
+					<tr>
+						<td>{{ loop.index }}</td>
+						<td>
+							<a href="{{ path('app_sites_client_show', {'id': site.id}) }}">{{ site.nom }}</a>
+						</td>
+						<td>{{ site.client.nom }}</td>
+						<td>
+							<div class="btn-group">
+								<a href="{{ path('app_sites_client_show', {'id': site.id}) }}" class="btn btn-outline btn-sm">Voir</a>
+								{% if app.user and is_granted('ROLE_ADMIN') %}
+									<a href="{{ path('app_sites_client_edit', {'id': site.id}) }}" class="btn btn-secondary btn-sm">Modifier</a>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="4">Aucun site trouvé</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 {% endblock %}

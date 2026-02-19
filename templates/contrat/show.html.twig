@@ -1,37 +1,65 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consulter un contrat{% endblock %}
+{% block title %}Contrat
+	{{ contrat.numero }}
+{% endblock %}
 
 {% block body %}
-    <h1>Consulter un contrat</h1>
+	<div class="page-header">
+		<div>
+			<h1>Contrat
+				{{ contrat.numero }}</h1>
+			<p class="text-muted text-sm">{{ contrat.sitesClient.client.nom }}
+				—
+				{{ contrat.sitesClient.nom }}</p>
+		</div>
+		<div class="btn-group">
+			<a href="{{ path('app_zones_client_new', {'site_id': contrat.sitesClient.id}) }}" class="btn btn-primary">+ Ajouter une zone</a>
+			{% if app.user and is_granted('ROLE_ADMIN') %}
+				<a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-secondary">Modifier</a>
+			{% endif %}
+		</div>
+	</div>
 
-    <p><strong>Nom client :</strong> {{ contrat.sitesClient.client.nom }}</p>
-    <p><strong>Nom site :</strong> {{ contrat.sitesClient.nom }}</p>
-    <p><strong>Numéro de contrat :</strong> {{ contrat.numero }}</p>
+	{% for zone in contrat.sitesClient.zonesClients %}
+		<div class="card">
+			<div class="card-header">
+				<h2>{{ zone.nom }}</h2>
+				<div class="btn-group">
+					<span class="badge badge-primary">{{ zone.typeZone ? zone.typeZone.nom : 'Sans type' }}</span>
+					<a href="{{ path('app_zones_client_edit', {'id': zone.id}) }}" class="btn btn-outline btn-sm">Modifier</a>
+				</div>
+			</div>
 
-    <a href="{{ path('app_zones_client_new', {'site_id': contrat.sitesClient.id}) }}">Ajouter une zone</a>
+			<h3>Supports</h3>
+			{% if zone.supportClients|length > 0 %}
+				<ul class="info-list">
+					{% for support in zone.supportClients %}
+						<li>
+							<span class="info-label">Support :</span>
+							<span>{{ support.typeSupport.nom }}</span>
+						</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<p class="text-muted text-sm">Aucun support pour cette zone</p>
+			{% endif %}
 
-    {% for zone in contrat.sitesClient.zonesClients %}
-        <hr>
-        <h2>Nom zone client : {{ zone.nom }}</h2>
-        <p><em>Type : {{ zone.typeZone.nom }}</em></p>
+			<a href="{{ path('app_support_client_new', {'zone_id': zone.id}) }}" class="btn btn-outline btn-sm mt-1">+ Ajouter un support</a>
+		</div>
+	{% else %}
+		<div class="card">
+			<div class="empty-state">
+				<p>Aucune zone pour ce site</p>
+				<a href="{{ path('app_zones_client_new', {'site_id': contrat.sitesClient.id}) }}" class="btn btn-primary">Créer la première zone</a>
+			</div>
+		</div>
+	{% endfor %}
 
-        <h3>Supports :</h3>
-        <ul>
-            {% for support in zone.supportClients %}
-                <li>{{ support.typeSupport.nom }}</li>
-            {% else %}
-                <li>Aucun support</li>
-            {% endfor %}
-        </ul>
-
-        <a href="{{ path('app_zones_client_edit', {'id': zone.id}) }}">Modifier une zone</a>
-    {% else %}
-        <p>Aucune zone pour ce site</p>
-    {% endfor %}
-
-    <hr>
-    <a href="{{ path('app_client_show', {'id': contrat.sitesClient.client.id}) }}">Retour au client</a>
-    <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}">Modifier</a>
-    {{ include('contrat/_delete_form.html.twig') }}
+	<div class="btn-group mt-3">
+		<a href="{{ path('app_client_show', {'id': contrat.sitesClient.client.id}) }}" class="btn btn-secondary">← Retour au client</a>
+		{% if app.user and is_granted('ROLE_ADMIN') %}
+			{{ include('contrat/_delete_form.html.twig') }}
+		{% endif %}
+	</div>
 {% endblock %}

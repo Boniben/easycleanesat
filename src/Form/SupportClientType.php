@@ -14,20 +14,24 @@ class SupportClientType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // Ajoutez les champs du formulaire pour SupportClient
         $builder
             ->add('zonesClient', EntityType::class, [
                 'class' => ZonesClient::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
+                'label' => 'Zone',
             ])
             ->add('typeSupport', EntityType::class, [
                 'class' => TypeSupport::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
+                'label' => 'Type de support',
             ])
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
+        // Configurez les options du formulaire pour SupportClient
         $resolver->setDefaults([
             'data_class' => SupportClient::class,
         ]);

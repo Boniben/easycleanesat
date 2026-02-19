@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\SupportClient;
+use App\Entity\ZonesClient;
 use App\Form\SupportClientType;
 use App\Repository\SupportClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,10 +23,18 @@ final class SupportClientController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_support_client_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{zone_id}', name: 'app_support_client_new', methods: ['GET', 'POST'], defaults: ['zone_id' => null])]
+    public function new(Request $request, EntityManagerInterface $entityManager, ?int $zone_id = null): Response
     {
         $supportClient = new SupportClient();
+
+        if ($zone_id) {
+            $zone = $entityManager->getRepository(ZonesClient::class)->find($zone_id);
+            if ($zone) {
+                $supportClient->setZonesClient($zone);
+            }
+        }
+
         $form = $this->createForm(SupportClientType::class, $supportClient);
         $form->handleRequest($request);
 
@@ -33,7 +42,8 @@ final class SupportClientController extends AbstractController
             $entityManager->persist($supportClient);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_support_client_index', [], Response::HTTP_SEE_OTHER);
+            $clientId = $supportClient->getZonesClient()->getSitesClient()->getClient()->getId();
+            return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('support_client/new.html.twig', [
@@ -59,7 +69,8 @@ final class SupportClientController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_support_client_index', [], Response::HTTP_SEE_OTHER);
+            $clientId = $supportClient->getZonesClient()->getSitesClient()->getClient()->getId();
+            return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('support_client/edit.html.twig', [
@@ -71,11 +82,11 @@ final class SupportClientController extends AbstractController
     #[Route('/{id}', name: 'app_support_client_delete', methods: ['POST'])]
     public function delete(Request $request, SupportClient $supportClient, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$supportClient->getId(), $request->getPayload()->getString('_token'))) {
+        $clientId = $supportClient->getZonesClient()->getSitesClient()->getClient()->getId();
+        if ($this->isCsrfTokenValid('delete' . $supportClient->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($supportClient);
             $entityManager->flush();
         }
-
-        return $this->redirectToRoute('app_support_client_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_client_show', ['id' => $clientId], Response::HTTP_SEE_OTHER);
     }
 }

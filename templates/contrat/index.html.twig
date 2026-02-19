@@ -1,35 +1,51 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Contrat index{% endblock %}
+{% block title %}Liste des contrats
+{% endblock %}
 
 {% block body %}
-    <h1>Contrat index</h1>
+	<div class="page-header">
+		<h1>Liste des contrats</h1>
+		{% if app.user and is_granted('ROLE_ADMIN') %}
+			<a href="{{ path('app_contrat_new') }}" class="btn btn-primary">+ Ajouter un contrat</a>
+		{% endif %}
+	</div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Numero</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for contrat in contrats %}
-            <tr>
-                <td>{{ contrat.id }}</td>
-                <td>{{ contrat.numero }}</td>
-                <td>
-                    <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}">show</a>
-                    <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_contrat_new') }}">Create new</a>
+	<div class="table-wrapper">
+		<table>
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Numéro</th>
+					<th>Site</th>
+					<th>Client</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for contrat in contrats %}
+					<tr>
+						<td>{{ contrat.id }}</td>
+						<td>
+							<a href="{{ path('app_contrat_show', {'id': contrat.id}) }}">{{ contrat.numero }}</a>
+						</td>
+						<td>{{ contrat.sitesClient.nom }}</td>
+						<td>{{ contrat.sitesClient.client.nom }}</td>
+						<td>
+							<div class="btn-group">
+								<a href="{{ path('app_contrat_show', {'id': contrat.id}) }}" class="btn btn-outline btn-sm">Voir</a>
+								{% if app.user and is_granted('ROLE_ADMIN') %}
+									<a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-secondary btn-sm">Modifier</a>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="5">Aucun contrat trouvé</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 {% endblock %}
