@@ -27,12 +27,18 @@ final class InterventionController extends AbstractController
     {
         $intervention = new Intervention();
         
-        // Récupérer le client_id depuis l'URL
+        // Récupérer les paramètres depuis l'URL
         $clientId = $request->query->get('client_id');
+        $sitesClientId = $request->query->get('sites_client_id');
+        $contratId = $request->query->get('contrat_id');
+        $zonesClientId = $request->query->get('zones_client_id');
         
-        // Créer le formulaire en passant le client_id et l'EntityManager comme options
+        // Créer le formulaire en passant les paramètres comme options
         $form = $this->createForm(InterventionType::class, $intervention, [
             'client_id' => $clientId,
+            'sites_client_id' => $sitesClientId,
+            'contrat_id' => $contratId,
+            'zones_client_id' => $zonesClientId,
             'em' => $entityManager,
         ]);
         $form->handleRequest($request);

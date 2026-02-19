@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Client;
+use App\Entity\SitesClient;
 use App\Entity\Contrat;
 use App\Entity\ElementSecurite;
 use App\Entity\Intervention;
@@ -20,7 +21,52 @@ class InterventionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $em = $options['em'];
         $clientId = $options['client_id'];
+        $sitesClientId = $options['sites_client_id'];
+        $contratId = $options['contrat_id'];
+        $zonesClientId = $options['zones_client_id'];
+        
+        // Cascade de données à partir de zones_client_id
+        $zonesClient = null;
+        $contrat = null;
+        $sitesClient = null;
+        $client = null;
+        
+        if ($zonesClientId) {
+            $zonesClient = $em->getRepository(ZonesClient::class)->find($zonesClientId);
+            if ($zonesClient) {
+                $sitesClient = $zonesClient->getSitesClient();
+                if ($sitesClient) {
+                    $client = $sitesClient->getClient();
+                    // Récupérer le premier contrat du site si disponible
+                    if ($sitesClient->getContrats()->count() > 0) {
+                        $contrat = $sitesClient->getContrats()->first();
+                    }
+                }
+            }
+        }
+        // Cascade à partir de contrat_id
+        elseif ($contratId) {
+            $contrat = $em->getRepository(Contrat::class)->find($contratId);
+            if ($contrat) {
+                $sitesClient = $contrat->getSitesClient();
+                if ($sitesClient) {
+                    $client = $sitesClient->getClient();
+                }
+            }
+        }
+        // Cascade à partir de sites_client_id
+        elseif ($sitesClientId) {
+            $sitesClient = $em->getRepository(SitesClient::class)->find($sitesClientId);
+            if ($sitesClient) {
+                $client = $sitesClient->getClient();
+            }
+        }
+        // Seulement client_id
+        elseif ($clientId) {
+            $client = $em->getRepository(Client::class)->find($clientId);
+        }
         
         $builder
             ->add('client', EntityType::class, [
@@ -29,42 +75,67 @@ class InterventionType extends AbstractType
                 'placeholder' => 'Sélectionnez un client',
                 'mapped' => false, 
                 'required' => true,
-                'data' => $clientId ? $options['em']->getRepository(Client::class)->find($clientId) : null,
-                'query_builder' => function (EntityRepository $er) use ($clientId) {
+                'data' => $client,
+                'query_builder' => function (EntityRepository $er) use ($client) {
                     $qb = $er->createQueryBuilder('c');
-                    if ($clientId) {
+                    if ($client) {
                         $qb->where('c.id = :clientId')
-                           ->setParameter('clientId', $clientId);
+                           ->setParameter('clientId', $client->getId());
                     }
                     return $qb->orderBy('c.nom', 'ASC');
                 },
             ])
             ->add('site', EntityType::class, [
-                'class' => ZonesClient::class,
-                'choice_label' => function (ZonesClient $site) {
-                    return $siteName = $site->getSitesClient() ? $site->getSitesClient()->getNom() : 'N/A';
+                'class' => SitesClient::class,
+                'choice_label' => function (SitesClient $site) {
+                    return $site->getNom();
                 },
                 'placeholder' => 'Sélectionnez un site',
                 'mapped' => false, 
                 'required' => true,
+                'data' => $sitesClient,
+                'query_builder' => function (EntityRepository $er) use ($sitesClient) {
+                    $qb = $er->createQueryBuilder('s');
+                    if ($sitesClient) {
+                        $qb->where('s.id = :siteId')
+                           ->setParameter('siteId', $sitesClient->getId());
+                    }
+                    return $qb->orderBy('s.nom', 'ASC');
+                },
             ])
             ->add('contrat', EntityType::class, [
                 'class' => Contrat::class,
                 'choice_label' => function (Contrat $contrat) {
-                    $siteName = $contrat->getSitesClient() ? $contrat->getSitesClient()->getNom() : 'N/A';
                     return $contrat->getNumero();
                 },
                 'placeholder' => 'Sélectionnez un contrat',
                 'required' => false,
+                'data' => $contrat,
+                'query_builder' => function (EntityRepository $er) use ($contrat) {
+                    $qb = $er->createQueryBuilder('c');
+                    if ($contrat) {
+                        $qb->where('c.id = :contratId')
+                           ->setParameter('contratId', $contrat->getId());
+                    }
+                    return $qb->orderBy('c.numero', 'ASC');
+                },
             ])
             ->add('zonesClient', EntityType::class, [
                 'class' => ZonesClient::class,
                 'choice_label' => function (ZonesClient $zone) {
-                    $siteName = $zone->getSitesClient() ? $zone->getSitesClient()->getNom() : 'N/A';
                     return $zone->getNom();
                 },
                 'placeholder' => 'Sélectionnez une zone',
                 'required' => true,
+                'data' => $zonesClient,
+                'query_builder' => function (EntityRepository $er) use ($zonesClient) {
+                    $qb = $er->createQueryBuilder('z');
+                    if ($zonesClient) {
+                        $qb->where('z.id = :zoneId')
+                           ->setParameter('zoneId', $zonesClient->getId());
+                    }
+                    return $qb->orderBy('z.nom', 'ASC');
+                },
             ])
             ->add('redacteur', EntityType::class, [
                 'class' => Redacteur::class,
@@ -100,6 +171,9 @@ class InterventionType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Intervention::class,
             'client_id' => null,
+            'sites_client_id' => null,
+            'contrat_id' => null,
+            'zones_client_id' => null,
             'em' => null,
         ]);
     }
