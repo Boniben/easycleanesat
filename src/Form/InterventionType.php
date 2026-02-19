@@ -2,11 +2,13 @@
 
 namespace App\Form;
 
+use App\Entity\Client;
 use App\Entity\Contrat;
 use App\Entity\ElementSecurite;
 use App\Entity\Intervention;
 use App\Entity\Redacteur;
 use App\Entity\ZonesClient;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -18,15 +20,24 @@ class InterventionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $clientId = $options['client_id'];
+        
         $builder
             ->add('client', EntityType::class, [
-                'class' => ZonesClient::class,
-                'choice_label' => function (ZonesClient $client) {
-                    return $clientName = $client->getSitesClient() && $client->getSitesClient()->getClient() ? $client->getSitesClient()->getClient()->getNom() : 'N/A';    
-                },
+                'class' => Client::class,
+                'choice_label' => 'nom',
                 'placeholder' => 'Sélectionnez un client',
                 'mapped' => false, 
                 'required' => true,
+                'data' => $clientId ? $options['em']->getRepository(Client::class)->find($clientId) : null,
+                'query_builder' => function (EntityRepository $er) use ($clientId) {
+                    $qb = $er->createQueryBuilder('c');
+                    if ($clientId) {
+                        $qb->where('c.id = :clientId')
+                           ->setParameter('clientId', $clientId);
+                    }
+                    return $qb->orderBy('c.nom', 'ASC');
+                },
             ])
             ->add('site', EntityType::class, [
                 'class' => ZonesClient::class,
@@ -88,6 +99,8 @@ class InterventionType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Intervention::class,
+            'client_id' => null,
+            'em' => null,
         ]);
     }
 }

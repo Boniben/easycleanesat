@@ -18,7 +18,7 @@
 
         <h3>Supports :</h3>
         <ul>
-            {% for support in zone.supportClients %}
+            {% for support in zone.supportsClient %}
                 <li>{{ support.typeSupport.nom }}</li>
             {% else %}
                 <li>Aucun support</li>

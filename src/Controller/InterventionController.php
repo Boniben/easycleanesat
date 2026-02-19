@@ -26,7 +26,15 @@ final class InterventionController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $intervention = new Intervention();
-        $form = $this->createForm(InterventionType::class, $intervention);
+        
+        // Récupérer le client_id depuis l'URL
+        $clientId = $request->query->get('client_id');
+        
+        // Créer le formulaire en passant le client_id et l'EntityManager comme options
+        $form = $this->createForm(InterventionType::class, $intervention, [
+            'client_id' => $clientId,
+            'em' => $entityManager,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
