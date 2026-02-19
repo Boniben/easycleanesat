@@ -9,27 +9,35 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Meo Produit</th>
-                <th>Interventions</th>
-                <th>actions</th>
+                <th>Tache</th>
+                <th>Support</th>
+                <th>Matériel</th>
+                <th>Reutilisable</th>
+                <th>Accessoire</th>
+                <th>Consommable</th>
+                <th>Code Produit</th>
+                <th>Id Contenant</th>
+                <th>Code Moyen Dilution</th>
+                <th>Modifier</th>
             </tr>
         </thead>
         <tbody>
         {% for action in actions %}
             <tr>
                 <td>{{ action.id }}</td>
-                <td>{{ action.meoProduit ? action.meoProduit.id : '' }}</td>
-                <td>
-                    {% if action.interventions is not empty %}
-                        {{ action.interventions|length }} intervention(s)
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
+                {% for necessaire in action.necessaire %}
+                <td>{{necessaire.code}} </td>
+                {% endfor %}
+
+                <!--<td>{{dump(action)}}</td>-->
+                <td>{{action.meoProduit.produit.code}}</td>
+                <td>{{action.meoProduit.contenant ? action.meoProduit.contenant.id : '0'}}</td>
+                <td>{{action.meoProduit.moyenDosage ? action.meoProduit.moyenDosage.code : '0'}}</td>
                 <td>
                     <a href="{{ path('app_actions_show', {'id': action.id}) }}">show</a>
                     <a href="{{ path('app_actions_edit', {'id': action.id}) }}">edit</a>
                 </td>
+
             </tr>
         {% else %}
             <tr>

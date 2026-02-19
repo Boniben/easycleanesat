@@ -1,58 +1,96 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Actions{% endblock %}
+{% block title %}Action #{{ action.id }}{% endblock %}
 
 {% block body %}
-    <h1>Actions</h1>
+    <h1>Détails de l'Action #{{ action.id }}</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ action.id }}</td>
-            </tr>
-            <tr>
-                <th>Meo Produit</th>
-                <td>{{ action.meoProduit ? action.meoProduit.id : '' }}</td>
-            </tr>
-            <tr>
-                <th>Interventions</th>
-                <td>
-                    {% if action.interventions is not empty %}
-                        <ul>
-                            {% for intervention in action.interventions %}
-                                <li>
-                                    <a href="{{ path('app_intervention_show', {'id': intervention.id}) }}">
-                                        Intervention #{{ intervention.id }}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        Aucune intervention
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>Necessaires</th>
-                <td>
-                    {% if action.necessaire is not empty %}
-                        <ul>
-                            {% for nec in action.necessaire %}
-                                <li>{{ nec.id }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        Aucun necessaire
-                    {% endif %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3>Produit (MEO)</h3>
+        </div>
+        <div class="card-body">
+            {% if action.meoProduit %}
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Code Produit</th>
+                        <td>{{ action.meoProduit.produit ? action.meoProduit.produit.code : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nom Produit</th>
+                        <td>{{ action.meoProduit.produit ? action.meoProduit.produit.nom : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Contenant</th>
+                        <td>{{ action.meoProduit.contenant ? action.meoProduit.contenant.id : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Moyen de Dosage</th>
+                        <td>{{ action.meoProduit.moyenDosage ? action.meoProduit.moyenDosage.code : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Volume Produit</th>
+                        <td>{{ action.meoProduit.volumeProduit ? action.meoProduit.volumeProduit : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Temps de Contact</th>
+                        <td>{{ action.meoProduit.tempsContact ? action.meoProduit.tempsContact.id : 'N/A' }}</td>
+                    </tr>
+                </table>
+            {% else %}
+                <p class="text-muted">Aucun produit associé</p>
+            {% endif %}
+        </div>
+    </div>
 
-    <a href="{{ path('app_actions_index') }}">back to list</a>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3>Nécessaires</h3>
+        </div>
+        <div class="card-body">
+            {% if action.necessaire|length > 0 %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Nom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for necessaire in action.necessaire %}
+                            <tr>
+                                <td>{{ necessaire.code }}</td>
+                                <td>{{ necessaire.nom }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">Aucun nécessaire associé</p>
+            {% endif %}
+        </div>
+    </div>
 
-    <a href="{{ path('app_actions_edit', {'id': action.id}) }}">edit</a>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3>Interventions</h3>
+        </div>
+        <div class="card-body">
+            {% if action.intervention|length > 0 %}
+                <ul>
+                    {% for intervention in action.intervention %}
+                        <li>Intervention #{{ intervention.id }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Aucune intervention associée</p>
+            {% endif %}
+        </div>
+    </div>
 
-    {{ include('actions/_delete_form.html.twig') }}
+    <div class="mt-3">
+        <a href="{{ path('app_actions_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        <a href="{{ path('app_actions_edit', {'id': action.id}) }}" class="btn btn-primary">Modifier</a>
+        {{ include('actions/_delete_form.html.twig') }}
+    </div>
 {% endblock %}
