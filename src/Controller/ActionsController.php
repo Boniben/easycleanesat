@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Actions;
 use App\Form\ActionsType;
 use App\Repository\ActionsRepository;
+use App\Repository\TypeNecessaireRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/new', name: 'app_actions_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository): Response
     {
         $action = new Actions();
         $form = $this->createForm(ActionsType::class, $action);
@@ -36,9 +37,12 @@ final class ActionsController extends AbstractController
             return $this->redirectToRoute('app_actions_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $typesNecessaires = $typeNecessaireRepository->findAll();
+
         return $this->render('actions/new.html.twig', [
             'action' => $action,
             'form' => $form,
+            'typesNecessaires' => $typesNecessaires,
         ]);
     }
 
@@ -51,7 +55,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_actions_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Actions $action, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Actions $action, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository): Response
     {
         $form = $this->createForm(ActionsType::class, $action);
         $form->handleRequest($request);
@@ -62,9 +66,12 @@ final class ActionsController extends AbstractController
             return $this->redirectToRoute('app_actions_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $typesNecessaires = $typeNecessaireRepository->findAll();
+
         return $this->render('actions/edit.html.twig', [
             'action' => $action,
             'form' => $form,
+            'typesNecessaires' => $typesNecessaires,
         ]);
     }
 

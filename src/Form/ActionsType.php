@@ -18,18 +18,33 @@ class ActionsType extends AbstractType
         $builder
             ->add('meo_produit', EntityType::class, [
                 'class' => MeoProduit::class,
-                'choice_label' => 'id',
+                'choice_label' => function (MeoProduit $meoProduit) {
+                    $label = 'ID: ' . $meoProduit->getId();
+                    if ($meoProduit->getProduit()) {
+                        $label .= ' - ' . $meoProduit->getProduit()->getNom() . ' (' . $meoProduit->getProduit()->getCode() . ')';
+                    }
+                    if ($meoProduit->getContenant()) {
+                        $label .= ' - Contenant: ' . $meoProduit->getContenant()->getId();
+                    }
+                    return $label;
+                },
+                'label' => 'Produit (MEO)',
+            ])
+            ->add('necessaire', EntityType::class, [
+                'class' => Necessaire::class,
+                'choice_label' => function (Necessaire $necessaire) {
+                    return $necessaire->getCode() . ' - ' . $necessaire->getNom();
+                },
+                'multiple' => true,
+                'expanded' => true,
+                'label' => false,
             ])
             ->add('intervention', EntityType::class, [
                 'class' => Intervention::class,
                 'choice_label' => 'id',
                 'multiple' => true,
                 'required' => false,
-            ])
-            ->add('necessaire', EntityType::class, [
-                'class' => Necessaire::class,
-                'choice_label' => 'id',
-                'multiple' => true,
+                'label' => 'Interventions',
             ])
         ;
     }

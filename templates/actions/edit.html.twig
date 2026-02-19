@@ -4,6 +4,10 @@
 
 {% block body %}
     <h1>Modifier une action</h1>
+    
+    <div class="alert-warning-custom">
+        ⚠️ <strong>Attention :</strong> Ne pas éditer d'action ! Archiver et créer une nouvelle action sauf cas particulier !
+    </div>
 
     {{ include('actions/_form.html.twig', {'button_label': 'Update'}) }}
 
