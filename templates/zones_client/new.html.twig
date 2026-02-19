@@ -1,11 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer une nouvelle zone client{% endblock %}
+{% block title %}Créer zone client
+{% endblock %}
 
 {% block body %}
-    <h1>Créer une nouvelle zone client</h1>
+	<h1>Créer une nouvelle zone client</h1>
 
-    {{ include('zones_client/_form.html.twig') }}
+	{{ include('zones_client/_form.html.twig') }}
 
-    <a href="{{ path('app_zones_client_index') }}">retour à la liste</a>
+	<a href="{{ path('app_zones_client_index') }}">Retour à la liste</a>
 {% endblock %}

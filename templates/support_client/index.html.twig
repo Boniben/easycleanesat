@@ -1,33 +1,35 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SupportClient index{% endblock %}
+{% block title %}Support Client
+{% endblock %}
 
 {% block body %}
-    <h1>SupportClient index</h1>
+	<h1>Support Client</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for support_client in support_clients %}
-            <tr>
-                <td>{{ support_client.id }}</td>
-                <td>
-                    <a href="{{ path('app_support_client_show', {'id': support_client.id}) }}">show</a>
-                    <a href="{{ path('app_support_client_edit', {'id': support_client.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="2">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for support_client in support_clients %}
+				<tr>
+					<td>{{ support_client.id }}</td>
+					<td>
+						<a href="{{ path('app_support_client_show', {'id': support_client.id}) }}">Voir</a>
+						<a href="{{ path('app_support_client_edit', {'id': support_client.id}) }}">Modifier
+						</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="2">Aucun support client trouvé</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
-    <a href="{{ path('app_support_client_new') }}">Create new</a>
+	<a href="{{ path('app_support_client_new') }}">Créer</a>
 {% endblock %}

@@ -1,13 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit SupportClient{% endblock %}
+{% block title %}Modifier un support client
+{% endblock %}
 
 {% block body %}
-    <h1>Edit SupportClient</h1>
+	<h1>Modifier un support client</h1>
 
-    {{ include('support_client/_form.html.twig', {'button_label': 'Update'}) }}
+	{{ include('support_client/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_support_client_index') }}">back to list</a>
+	<a href="{{ path('app_support_client_index') }}">Retour à la liste</a>
 
-    {{ include('support_client/_delete_form.html.twig') }}
+	{{ include('support_client/_delete_form.html.twig') }}
 {% endblock %}
