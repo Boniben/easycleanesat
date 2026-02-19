@@ -1,35 +1,49 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Zones Client{% endblock %}
+{% block title %}Liste des zones
+{% endblock %}
 
 {% block body %}
-    <h1>Zones Client</h1>
+	<div class="page-header">
+		<h1>Liste des zones</h1>
+		<a href="{{ path('app_zones_client_new') }}" class="btn btn-primary">+ Ajouter une zone</a>
+	</div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for zones_client in zones_clients %}
-            <tr>
-                <td>{{ zones_client.id }}</td>
-                <td>{{ zones_client.nom }}</td>
-                <td>
-                    <a href="{{ path('app_zones_client_show', {'id': zones_client.id}) }}">Voir</a>
-                    <a href="{{ path('app_zones_client_edit', {'id': zones_client.id}) }}">Modifier</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_zones_client_new') }}">Créer une nouvelle zone client</a>
+	<div class="table-wrapper">
+		<table>
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Nom</th>
+					<th>Type</th>
+					<th>Site</th>
+					<th>Client</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for zone in zones_clients %}
+					<tr>
+						<td>{{ loop.index }}</td>
+						<td>
+							<a href="{{ path('app_zones_client_show', {'id': zone.id}) }}">{{ zone.nom }}</a>
+						</td>
+						<td>{{ zone.typeZone ? zone.typeZone.nom : 'Sans type' }}</td>
+						<td>{{ zone.sitesClient.nom }}</td>
+						<td>{{ zone.sitesClient.client.nom }}</td>
+						<td>
+							<div class="btn-group">
+								<a href="{{ path('app_zones_client_show', {'id': zone.id}) }}" class="btn btn-outline btn-sm">Voir</a>
+								<a href="{{ path('app_zones_client_edit', {'id': zone.id}) }}" class="btn btn-secondary btn-sm">Modifier</a>
+							</div>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="6">Aucune zone trouvée</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 {% endblock %}

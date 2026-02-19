@@ -33,14 +33,14 @@ security:
 
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
-  access_control:
-    - { path: .*/client/new, roles: ROLE_ADMIN }
-    - { path: .*/sites/client/new, roles: ROLE_ADMIN }
-    - { path: .*/contrat/new, roles: ROLE_ADMIN }
-    - { path: .*/client/\d+/edit, roles: ROLE_ADMIN }
-    - { path: .*/sites/client/\d+/edit, roles: ROLE_ADMIN }
-    - { path: .*/contrat/\d+/edit, roles: ROLE_ADMIN }
-    # - { path: ^/profile, roles: ROLE_USER }
+  # access_control:
+  # - { path: .*/client/new, roles: ROLE_ADMIN }
+  # - { path: .*/sites/client/new, roles: ROLE_ADMIN }
+  # - { path: .*/contrat/new, roles: ROLE_ADMIN }
+  # - { path: .*/client/\d+/edit, roles: ROLE_ADMIN }
+  # - { path: .*/sites/client/\d+/edit, roles: ROLE_ADMIN }
+  # - { path: .*/contrat/\d+/edit, roles: ROLE_ADMIN }
+  # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
   security:

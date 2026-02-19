@@ -52,7 +52,7 @@
 				<ul class="info-list">
 					{% for zone in site.zonesClients %}
 						<li>
-							<span class="info-label">{{ zone.typeZone }}</span>
+							<span class="info-label">{{ zone.typeZone ? zone.typeZone.nom : 'Sans type' }}</span>
 							<a href="{{ path('app_zones_client_show', {'id': zone.id}) }}">{{ zone.nom }}</a>
 						</li>
 					{% endfor %}
