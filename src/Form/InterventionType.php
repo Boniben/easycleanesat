@@ -94,11 +94,16 @@ class InterventionType extends AbstractType
                 'mapped' => false, 
                 'required' => true,
                 'data' => $sitesClient,
-                'query_builder' => function (EntityRepository $er) use ($sitesClient) {
+                'query_builder' => function (EntityRepository $er) use ($sitesClient, $client) {
                     $qb = $er->createQueryBuilder('s');
                     if ($sitesClient) {
+                        // Si un site est pré-rempli, afficher uniquement ce site
                         $qb->where('s.id = :siteId')
                            ->setParameter('siteId', $sitesClient->getId());
+                    } elseif ($client) {
+                        // Sinon, filtrer par client
+                        $qb->where('s.client = :client')
+                           ->setParameter('client', $client);
                     }
                     return $qb->orderBy('s.nom', 'ASC');
                 },
@@ -111,11 +116,16 @@ class InterventionType extends AbstractType
                 'placeholder' => 'Sélectionnez un contrat',
                 'required' => false,
                 'data' => $contrat,
-                'query_builder' => function (EntityRepository $er) use ($contrat) {
+                'query_builder' => function (EntityRepository $er) use ($contrat, $sitesClient) {
                     $qb = $er->createQueryBuilder('c');
                     if ($contrat) {
+                        // Si un contrat est pré-rempli, afficher uniquement ce contrat
                         $qb->where('c.id = :contratId')
                            ->setParameter('contratId', $contrat->getId());
+                    } elseif ($sitesClient) {
+                        // Sinon, filtrer par site
+                        $qb->where('c.sitesClient = :site')
+                           ->setParameter('site', $sitesClient);
                     }
                     return $qb->orderBy('c.numero', 'ASC');
                 },
@@ -128,11 +138,16 @@ class InterventionType extends AbstractType
                 'placeholder' => 'Sélectionnez une zone',
                 'required' => true,
                 'data' => $zonesClient,
-                'query_builder' => function (EntityRepository $er) use ($zonesClient) {
+                'query_builder' => function (EntityRepository $er) use ($zonesClient, $sitesClient) {
                     $qb = $er->createQueryBuilder('z');
                     if ($zonesClient) {
+                        // Si une zone est pré-remplie, afficher uniquement cette zone
                         $qb->where('z.id = :zoneId')
                            ->setParameter('zoneId', $zonesClient->getId());
+                    } elseif ($sitesClient) {
+                        // Sinon, filtrer par site
+                        $qb->where('z.sitesClient = :site')
+                           ->setParameter('site', $sitesClient);
                     }
                     return $qb->orderBy('z.nom', 'ASC');
                 },
