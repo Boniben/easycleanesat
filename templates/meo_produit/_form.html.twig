@@ -1,4 +1,10 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'id': 'meoForm'}}) }}
+    {% if meo_produit.produit %}
+        <div class="form-group">
+            <label>Nom du produit</label>
+            <p>{{ meo_produit.produit.nom }}</p>
+        </div>
+    {% endif %}
     {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <button type="submit" class="btn btn-primary" onclick="return confirm('Ce n\'est pas une bonne pratique. Voulez-vous continuer ?');">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}

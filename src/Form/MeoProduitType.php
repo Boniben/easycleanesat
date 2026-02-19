@@ -21,23 +21,22 @@ class MeoProduitType extends AbstractType
             ->add('volumeProduit')
             ->add('produit', EntityType::class, [
                 'class' => Produit::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
             ->add('contenant', EntityType::class, [
                 'class' => Contenant::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
             ->add('uniteVolume', EntityType::class, [
                 'class' => UniteVolume::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
             ->add('moyenDosage', EntityType::class, [
                 'class' => MoyenDosage::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
             ->add('tempsContact', EntityType::class, [
                 'class' => TempsContact::class,
-                'choice_label' => 'id',
             ])
         ;
     }

@@ -9,9 +9,10 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Code</th>
                 <th>Nom</th>
                 <th>Couleur</th>
-                <th>Code</th>
+                
                 <th>actions</th>
             </tr>
         </thead>
@@ -19,9 +20,10 @@
         {% for produit in produits %}
             <tr>
                 <td>{{ produit.id }}</td>
+                <td>{{ produit.code }}</td>
                 <td>{{ produit.nom }}</td>
                 <td>{{ produit.couleur }}</td>
-                <td>{{ produit.code }}</td>
+                
                 <td>
                     <a href="{{ path('app_produit_show', {'id': produit.id}) }}">show</a>
                     <a href="{{ path('app_produit_edit', {'id': produit.id}) }}">edit</a>
