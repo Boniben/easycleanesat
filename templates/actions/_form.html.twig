@@ -1,4 +1,154 @@
+<style>
+    .necessaire-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+    }
+    .necessaire-bloc {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #f8f9fa;
+    }
+    .necessaire-bloc h6 {
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #007bff;
+        font-weight: bold;
+    }
+    .necessaire-search {
+        width: 100%;
+        padding: 5px 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 3px;
+        font-size: 0.9rem;
+    }
+    .necessaire-list {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 5px;
+    }
+    .necessaire-list .form-check {
+        margin-bottom: 0;
+        padding: 8px 0;
+        padding-left: 0;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .necessaire-list .form-check:last-child {
+        border-bottom: none;
+    }
+    .necessaire-list .form-check-input {
+        margin-top: 0;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+    .necessaire-list .form-check-label {
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+    .btn-uncheck-all {
+        font-size: 0.8rem;
+        padding: 3px 10px;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    .alert-warning-custom {
+        background-color: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+</style>
+
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Produit et Dosage</h5>
+                    {{ form_row(form.meo_produit) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Nécessaires (Équipements requis)</h5>
+                    <div class="necessaire-grid">
+                        {% for typeNecessaire in typesNecessaires %}
+                            <div class="necessaire-bloc" data-type-id="{{ typeNecessaire.id }}">
+                                <h6>{{ typeNecessaire.nom }}</h6>
+                                <button type="button" class="btn btn-warning btn-sm btn-uncheck-all" data-type="{{ typeNecessaire.id }}">
+                                    ✖ Tout décocher
+                                </button>
+                                <input type="text" class="necessaire-search" placeholder="Rechercher..." data-type="{{ typeNecessaire.id }}">
+                                <div class="necessaire-list" data-type="{{ typeNecessaire.id }}">
+                                    {% for necessaire in typeNecessaire.necessaires %}
+                                        {% for child in form.necessaire.children %}
+                                            {% if child.vars.value == necessaire.id %}
+                                                <div class="form-check necessaire-item" data-name="{{ necessaire.code|lower }} {{ necessaire.nom|lower }}">
+                                                    {{ form_widget(child) }}
+                                                    {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;">
+        {{ form_row(form.intervention) }}
+    </div>
+
+    <div class="text-center">
+        <button class="btn btn-primary btn-lg">{{ button_label|default('Enregistrer') }}</button>
+    </div>
 {{ form_end(form) }}
+
+<script>
+    // Fonction de recherche pour chaque bloc de nécessaires
+    document.querySelectorAll('.necessaire-search').forEach(searchInput => {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const typeId = this.dataset.type;
+            const list = document.querySelector(`.necessaire-list[data-type="${typeId}"]`);
+            const items = list.querySelectorAll('.necessaire-item');
+            
+            items.forEach(item => {
+                const itemName = item.dataset.name;
+                if (itemName.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Fonction "Tout décocher" pour chaque bloc
+    document.querySelectorAll('.btn-uncheck-all').forEach(button => {
+        button.addEventListener('click', function() {
+            const typeId = this.dataset.type;
+            const list = document.querySelector(`.necessaire-list[data-type="${typeId}"]`);
+            const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
+    });
+</script>
