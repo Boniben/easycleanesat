@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Actions;
 use App\Entity\Necessaire;
+use App\Entity\TypeNecessaire;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,11 +17,17 @@ class NecessaireType extends AbstractType
         $builder
             ->add('nom')
             ->add('code')
-            ->add('type')
+            ->add('type_necessaire', EntityType::class, [
+                'class' => TypeNecessaire::class,
+                'choice_label' => 'nom',
+                'label' => 'Type',
+                'placeholder' => 'Sélectionner un type',
+            ])
             ->add('actions', EntityType::class, [
                 'class' => Actions::class,
                 'choice_label' => 'id',
                 'multiple' => true,
+                'required' => false,
             ])
         ;
     }
