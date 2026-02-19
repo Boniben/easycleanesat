@@ -1,37 +1,45 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Type de support{% endblock %}
+{% block title %}Types de support
+{% endblock %}
 
 {% block body %}
-    <h1>Type de support</h1>
+	<div class="page-header">
+		<h1>Types de support</h1>
+		{% if app.user and is_granted('ROLE_ADMIN') %}
+			<a href="{{ path('app_type_support_new') }}" class="btn btn-primary">+ Ajouter un type</a>
+		{% endif %}
+	</div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Picto</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for type_support in type_supports %}
-            <tr>
-                <td>{{ type_support.id }}</td>
-                <td>{{ type_support.nom }}</td>
-                <td>{{ type_support.picto }}</td>
-                <td>
-                    <a href="{{ path('app_type_support_show', {'id': type_support.id}) }}">Voir</a>
-                    <a href="{{ path('app_type_support_edit', {'id': type_support.id}) }}">Modifier</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_type_support_new') }}">Créer un nouveau type de support</a>
+	<div class="table-wrapper">
+		<table>
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Nom</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for type_support in type_supports %}
+					<tr>
+						<td>{{ loop.index }}</td>
+						<td>{{ type_support.nom }}</td>
+						<td>
+							<div class="btn-group">
+								<a href="{{ path('app_type_support_show', {'id': type_support.id}) }}" class="btn btn-outline btn-sm">Voir</a>
+								{% if app.user and is_granted('ROLE_ADMIN') %}
+									<a href="{{ path('app_type_support_edit', {'id': type_support.id}) }}" class="btn btn-secondary btn-sm">Modifier</a>
+								{% endif %}
+							</div>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="3">Aucun type de support trouvé</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 {% endblock %}

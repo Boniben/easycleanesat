@@ -1,46 +1,78 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Consulter un client{% endblock %}
+{% block title %}
+	{{ client.nom }}
+	— Consulter
+{% endblock %}
 
 {% block body %}
-    <h1>Consulter un client</h1>
+	<div class="page-header">
+		<div>
+			<h1>{{ client.nom }}</h1>
+			<p class="text-muted text-sm">Détail du client et de ses sites</p>
+		</div>
+		<div class="btn-group">
+			{% if app.user and is_granted('ROLE_ADMIN') %}
+				<a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}" class="btn btn-primary">+ Ajouter un site</a>
+				<a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-secondary">Modifier</a>
+			{% endif %}
+		</div>
+	</div>
 
-    <p><strong>Nom client :</strong> {{ client.nom }}</p>
+	{% for site in client.sitesClients %}
+		<div class="card">
+			<div class="card-header">
+				<h2>{{ site.nom }}</h2>
+				<div class="btn-group">
+					<a href="{{ path('app_zones_client_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Zone</a>
+					{% if app.user and is_granted('ROLE_ADMIN') %}
+						<a href="{{ path('app_contrat_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Contrat</a>
+					{% endif %}
+				</div>
+			</div>
 
-    <a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}">Ajouter un site client</a>
+			<h3>Contrats</h3>
+			{% if site.contrats|length > 0 %}
+				<ul class="info-list">
+					{% for contrat in site.contrats %}
+						<li>
+							<span class="info-label">Contrat :</span>
+							<a href="{{ path('app_contrat_show', {'id': contrat.id}) }}">{{ contrat.numero }}</a>
+						</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<p class="text-muted text-sm">Aucun contrat pour ce site</p>
+			{% endif %}
 
-    {% for site in client.sitesClients %}
-        <hr>
-        <h2>Nom Site : {{ site.nom }}</h2>
+			<hr>
 
-        <h3>Numéros de contrat :</h3>
-        <ul>
-            {% for contrat in site.contrats %}
-                <li>
-                    <a href="{{ path('app_contrat_show', {'id': contrat.id}) }}">
-                        {{ contrat.numero }}
-                    </a>
-                </li>
-            {% else %}
-                <li>Aucun contrat</li>
-            {% endfor %}
-        </ul>
+			<h3>Zones</h3>
+			{% if site.zonesClients|length > 0 %}
+				<ul class="info-list">
+					{% for zone in site.zonesClients %}
+						<li>
+							<span class="info-label">{{ zone.typeZone ? zone.typeZone.nom : 'Sans type' }}</span>
+							<a href="{{ path('app_zones_client_show', {'id': zone.id}) }}">{{ zone.nom }}</a>
+						</li>
+					{% endfor %}
+				</ul>
+			{% else %}
+				<p class="text-muted text-sm">Aucune zone pour ce site</p>
+			{% endif %}
+		</div>
+	{% else %}
+		<div class="card">
+			<div class="empty-state">
+				<p>Aucun site pour ce client</p>
+			</div>
+		</div>
+	{% endfor %}
 
-        <a href="{{ path('app_contrat_new', {'site_id': site.id}) }}">Ajouter un contrat</a>
-    {% else %}
-        <p>Aucun site pour ce client</p>
-    {% endfor %}
-
-    <hr>
-    <a href="{{ path('app_client_index') }}">Retour à la liste des clients</a>
-    </br>
-    <a href="{{ path('app_client_edit', {'id': client.id}) }}">Modifier</a>
-    {{ include('client/_delete_form.html.twig') }}
-    
-    <section class="dashboard-actions">
-    <a class="dashboard-action" href="{{ path('app_intervention_new', {'client_id': client.id}) }}">
-        <strong>Ajouter une intervention</strong>
-        <span>Créer une nouvelle intervention pour {{ client.nom }}.</span>
-    </a>
-    </section>
+	<div class="btn-group mt-3">
+		<a href="{{ path('app_client_index') }}" class="btn btn-secondary">← Retour à la liste</a>
+		{% if app.user and is_granted('ROLE_ADMIN') %}
+			{{ include('client/_delete_form.html.twig') }}
+		{% endif %}
+	</div>
 {% endblock %}

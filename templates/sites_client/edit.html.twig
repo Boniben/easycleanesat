@@ -1,13 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier un site client{% endblock %}
+{% block title %}Modifier un site client
+{% endblock %}
 
 {% block body %}
-    <h1>Modifier un site client</h1>
+	<h1>Modifier un site client</h1>
 
-    {{ include('sites_client/_form.html.twig', {'button_label': 'Update'}) }}
+	{{ include('sites_client/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_sites_client_index') }}">back to list</a>
+	<a href="{{ path('app_sites_client_index') }}">Retour à la liste</a>
 
-    {{ include('sites_client/_delete_form.html.twig') }}
+	{{ include('sites_client/_delete_form.html.twig') }}
 {% endblock %}

@@ -6,9 +6,6 @@ use App\Entity\SitesClient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<SitesClient>
- */
 class SitesClientRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,12 @@ class SitesClientRepository extends ServiceEntityRepository
         parent::__construct($registry, SitesClient::class);
     }
 
-    //    /**
-    //     * @return SitesClient[] Returns an array of SitesClient objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function searchByNom(string $query): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT * FROM sites_client WHERE nom LIKE :q ORDER BY nom ASC';
+        $result = $conn->executeQuery($sql, ['q' => '%' . $query . '%']);
 
-    //    public function findOneBySomeField($value): ?SitesClient
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $this->findBy(['id' => array_column($result->fetchAllAssociative(), 'id')]);
+    }
 }

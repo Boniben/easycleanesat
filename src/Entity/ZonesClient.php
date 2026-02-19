@@ -28,7 +28,7 @@ class ZonesClient
      * @var Collection<int, SupportClient>
      */
     #[ORM\OneToMany(targetEntity: SupportClient::class, mappedBy: 'zonesClient')]
-    private Collection $supportsClient;
+    private Collection $supportClients;
 
     /**
      * @var Collection<int, Intervention>
@@ -38,7 +38,7 @@ class ZonesClient
 
     public function __construct()
     {
-        $this->supportsClient = new ArrayCollection();
+        $this->supportClients = new ArrayCollection();
         $this->interventions = new ArrayCollection();
     }
 
@@ -86,27 +86,27 @@ class ZonesClient
     /**
      * @return Collection<int, SupportClient>
      */
-    public function getSupportsClient(): Collection
+    public function getSupportClients(): Collection
     {
-        return $this->supportsClient;
+        return $this->supportClients;
     }
 
-    public function addSupportsClient(SupportClient $supportsClient): static
+    public function addSupportClient(SupportClient $supportClient): static
     {
-        if (!$this->supportsClient->contains($supportsClient)) {
-            $this->supportsClient->add($supportsClient);
-            $supportsClient->setZonesClient($this);
+        if (!$this->supportClients->contains($supportClient)) {
+            $this->supportClients->add($supportClient);
+            $supportClient->setZonesClient($this);
         }
 
         return $this;
     }
 
-    public function removeSupportsClient(SupportClient $supportsClient): static
+    public function removeSupportClient(SupportClient $supportClient): static
     {
-        if ($this->supportsClient->removeElement($supportsClient)) {
+        if ($this->supportClients->removeElement($s)) {
             // set the owning side to null (unless already changed)
-            if ($supportsClient->getZonesClient() === $this) {
-                $supportsClient->setZonesClient(null);
+            if ($supportClient->getZonesClient() === $this) {
+                $supportClient->setZonesClient(null);
             }
         }
 
