@@ -9,11 +9,11 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Code Meo produit</td>
                 <th>Nom produit</th>
-                <th>Couleur</th>
                 <th>Nom contenant</th>
                 <th>Nom moyen dilution</th>
-                <th>VolumeProduit</th>
+                <th>Volume de Produit</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -21,8 +21,16 @@
         {% for meo_produit in meo_produits %}
             <tr>
                 <td>{{ meo_produit.id }}</td>
+                <td>
+                {{ 
+                    (meo_produit.produit ? meo_produit.produit.code : '') 
+                    ~ '.0' ~ 
+                    (meo_produit.contenant ? meo_produit.contenant.id : '0') 
+                    ~ '.' ~ 
+                    (meo_produit.moyenDosage ? meo_produit.moyenDosage.code : '00') 
+                }}
+                </td>
                 <td>{{ meo_produit.produit ? meo_produit.produit.nom : '-' }}</td>
-                <td>{{ meo_produit.produit and meo_produit.produit.couleur ? meo_produit.produit.couleur : '-' }}</td>
                 <td>{{ meo_produit.contenant ? meo_produit.contenant.nom : '-' }}</td>
                 <td>{{ meo_produit.moyenDosage ? meo_produit.moyenDosage.nom : '-' }}</td>
                 <td>{{ meo_produit.volumeProduit }}</td>

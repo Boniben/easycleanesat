@@ -3,11 +3,12 @@
 {% block title %}Edit MeoProduit{% endblock %}
 
 {% block body %}
-    <h1>Edit MeoProduit</h1>
+    <h1>Modifier une Mise en oeuvre produit</h1>
+    <div class="alert alert-warning" role="alert">
+        <strong>Attention !</strong> Action à risque ! Bonne pratique : archiver, supprimer créer une nouvelle mise en oeuvre
+    </div>
 
-    {{ include('meo_produit/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('meo_produit/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_meo_produit_index') }}">back to list</a>
-
-    {{ include('meo_produit/_delete_form.html.twig') }}
+    <a href="{{ path('app_meo_produit_index') }}" class="btn btn-secondary mt-3">Voir la liste des Mise en oeuvre produit</a>
 {% endblock %}
