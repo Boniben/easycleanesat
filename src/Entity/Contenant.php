@@ -19,7 +19,7 @@ class Contenant
     private ?string $nom = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $volumeEau = null;
+    private ?float $volumeEau = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $picto = null;

@@ -28,7 +28,7 @@ class ZonesClient
      * @var Collection<int, SupportClient>
      */
     #[ORM\OneToMany(targetEntity: SupportClient::class, mappedBy: 'zonesClient')]
-    private Collection $y;
+    private Collection $supportClients;
 
     /**
      * @var Collection<int, Intervention>
@@ -38,7 +38,7 @@ class ZonesClient
 
     public function __construct()
     {
-        $this->y = new ArrayCollection();
+        $this->supportClients = new ArrayCollection();
         $this->interventions = new ArrayCollection();
     }
 
@@ -86,27 +86,27 @@ class ZonesClient
     /**
      * @return Collection<int, SupportClient>
      */
-    public function getY(): Collection
+    public function getSupportClients(): Collection
     {
-        return $this->y;
+        return $this->supportClients;
     }
 
-    public function addY(SupportClient $y): static
+    public function addSupportClient(SupportClient $supportClient): static
     {
-        if (!$this->y->contains($y)) {
-            $this->y->add($y);
-            $y->setZonesClient($this);
+        if (!$this->supportClients->contains($supportClient)) {
+            $this->supportClients->add($supportClient);
+            $supportClient->setZonesClient($this);
         }
 
         return $this;
     }
 
-    public function removeY(SupportClient $y): static
+    public function removeSupportClient(SupportClient $supportClient): static
     {
-        if ($this->y->removeElement($y)) {
+        if ($this->supportClients->removeElement($s)) {
             // set the owning side to null (unless already changed)
-            if ($y->getZonesClient() === $this) {
-                $y->setZonesClient(null);
+            if ($supportClient->getZonesClient() === $this) {
+                $supportClient->setZonesClient(null);
             }
         }
 

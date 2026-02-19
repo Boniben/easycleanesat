@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\Client;
@@ -10,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/sites/client')]
 final class SitesClientController extends AbstractController
@@ -21,7 +23,7 @@ final class SitesClientController extends AbstractController
             'sites_clients' => $sitesClientRepository->findAll(),
         ]);
     }
-
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/new/{client_id}', name: 'app_sites_client_new', methods: ['GET', 'POST'], defaults: ['client_id' => null])]
     public function new(Request $request, EntityManagerInterface $entityManager, ?int $client_id = null): Response
     {
@@ -57,7 +59,7 @@ final class SitesClientController extends AbstractController
             'sites_client' => $sitesClient,
         ]);
     }
-
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}/edit', name: 'app_sites_client_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, SitesClient $sitesClient, EntityManagerInterface $entityManager): Response
     {
@@ -74,12 +76,12 @@ final class SitesClientController extends AbstractController
             'form' => $form,
         ]);
     }
-
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_sites_client_delete', methods: ['POST'])]
     public function delete(Request $request, SitesClient $sitesClient, EntityManagerInterface $entityManager): Response
     {
         $clientId = $sitesClient->getClient()->getId();
-        if ($this->isCsrfTokenValid('delete'.$sitesClient->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $sitesClient->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($sitesClient);
             $entityManager->flush();
         }

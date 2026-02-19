@@ -1,11 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New SupportClient{% endblock %}
+{% block title %}Support Client
+{% endblock %}
 
 {% block body %}
-    <h1>Create new SupportClient</h1>
+	<h1>Créer un support client</h1>
 
-    {{ include('support_client/_form.html.twig') }}
+	{{ include('support_client/_form.html.twig') }}
 
-    <a href="{{ path('app_support_client_index') }}">back to list</a>
+	<a href="{{ path('app_support_client_index') }}">retour à la liste</a>
 {% endblock %}

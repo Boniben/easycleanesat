@@ -16,7 +16,7 @@ class MeoProduit
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $volumeProduit = null;
+    private ?float $volumeProduit = null;
 
     #[ORM\ManyToOne(inversedBy: 'meoProduits')]
     private ?Produit $produit = null;
