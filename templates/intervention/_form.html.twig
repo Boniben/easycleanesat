@@ -1,8 +1,49 @@
+<div data-controller="intervention-form"
+     data-intervention-form-sites-url-value="{{ path('api_sites_by_client', {'clientId': '__CLIENT_ID__'}) }}"
+     data-intervention-form-contrats-url-value="{{ path('api_contrats_by_site', {'siteId': '__SITE_ID__'}) }}"
+     data-intervention-form-zones-url-value="{{ path('api_zones_by_site', {'siteId': '__SITE_ID__'}) }}">
 {{ form_start(form) }}
-    {{ form_row(form.client) }}
-    {{ form_row(form.site) }}
-    {{ form_row(form.contrat) }}
-    {{ form_row(form.zonesClient) }}
+    <div>
+        {{ form_label(form.client) }}
+        {{ form_widget(form.client, {
+            'attr': {
+                'data-intervention-form-target': 'client',
+                'data-action': 'change->intervention-form#onClientChange'
+            }
+        }) }}
+        {{ form_errors(form.client) }}
+    </div>
+    
+    <div>
+        {{ form_label(form.site) }}
+        {{ form_widget(form.site, {
+            'attr': {
+                'data-intervention-form-target': 'site',
+                'data-action': 'change->intervention-form#onSiteChange'
+            }
+        }) }}
+        {{ form_errors(form.site) }}
+    </div>
+    
+    <div>
+        {{ form_label(form.contrat) }}
+        {{ form_widget(form.contrat, {
+            'attr': {
+                'data-intervention-form-target': 'contrat'
+            }
+        }) }}
+        {{ form_errors(form.contrat) }}
+    </div>
+    
+    <div>
+        {{ form_label(form.zonesClient) }}
+        {{ form_widget(form.zonesClient, {
+            'attr': {
+                'data-intervention-form-target': 'zone'
+            }
+        }) }}
+        {{ form_errors(form.zonesClient) }}
+    </div>
     {{ form_row(form.redacteur) }}
     {{ form_row(form.dateCreation) }}
     {{ form_row(form.nbTravailleur) }}

@@ -19,8 +19,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class InterventionType extends AbstractType
 {
+    /**
+     * Construction du formulaire d'intervention avec gestion de la pré-sélection en cascade.
+     * 
+     * LOGIQUE DE CASCADE :
+     * Si zones_client_id fourni → Déduit site, client, contrat
+     * Sinon si contrat_id fourni → Déduit site, client
+     * Sinon si sites_client_id fourni → Déduit client
+     * Sinon si client_id fourni → Utilise uniquement le client
+     * Sinon → Aucune pré-sélection, JavaScript Stimulus gère la dynamique
+     * 
+     * APPROCHE MIXTE :
+     * - Avec pré-sélection : query_builder filtre pour 1 seule option (verrouillé)
+     * - Sans pré-sélection : query_builder retourne liste vide, JavaScript la remplit en AJAX
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // Récupération des paramètres passés depuis le contrôleur
         $em = $options['em'];
         $clientId = $options['client_id'];
         $sitesClientId = $options['sites_client_id'];
@@ -33,6 +48,7 @@ class InterventionType extends AbstractType
         $sitesClient = null;
         $client = null;
         
+        // Priorité 1 : Zone client (le plus précis, permet de tout déduire)
         if ($zonesClientId) {
             $zonesClient = $em->getRepository(ZonesClient::class)->find($zonesClientId);
             if ($zonesClient) {
@@ -46,7 +62,7 @@ class InterventionType extends AbstractType
                 }
             }
         }
-        // Cascade à partir de contrat_id
+        // Priorité 2 : Contrat (permet de déduire site et client)
         elseif ($contratId) {
             $contrat = $em->getRepository(Contrat::class)->find($contratId);
             if ($contrat) {
@@ -56,14 +72,14 @@ class InterventionType extends AbstractType
                 }
             }
         }
-        // Cascade à partir de sites_client_id
+        // Priorité 3 : Site client (permet de déduire client)
         elseif ($sitesClientId) {
             $sitesClient = $em->getRepository(SitesClient::class)->find($sitesClientId);
             if ($sitesClient) {
                 $client = $sitesClient->getClient();
             }
         }
-        // Seulement client_id
+        // Priorité 4 : Client uniquement
         elseif ($clientId) {
             $client = $em->getRepository(Client::class)->find($clientId);
         }
@@ -91,19 +107,22 @@ class InterventionType extends AbstractType
                     return $site->getNom();
                 },
                 'placeholder' => 'Sélectionnez un site',
-                'mapped' => false, 
+                'mapped' => false,  // Pas mappé directement sur Intervention (champ intermédiaire)
                 'required' => true,
-                'data' => $sitesClient,
+                'data' => $sitesClient,  // Pré-remplissage si disponible
                 'query_builder' => function (EntityRepository $er) use ($sitesClient, $client) {
                     $qb = $er->createQueryBuilder('s');
                     if ($sitesClient) {
-                        // Si un site est pré-rempli, afficher uniquement ce site
+                        // CAS 1 : Pré-sélection précise (depuis zone ou contrat)
                         $qb->where('s.id = :siteId')
                            ->setParameter('siteId', $sitesClient->getId());
                     } elseif ($client) {
-                        // Sinon, filtrer par client
+                        // CAS 2 : Filtrage par client (depuis client_id)
                         $qb->where('s.client = :client')
                            ->setParameter('client', $client);
+                    } else {
+                        // CAS 3 : Aucune pré-sélection, liste vide (Stimulus gère)
+                        $qb->where('1 = 0');
                     }
                     return $qb->orderBy('s.nom', 'ASC');
                 },
@@ -123,9 +142,12 @@ class InterventionType extends AbstractType
                         $qb->where('c.id = :contratId')
                            ->setParameter('contratId', $contrat->getId());
                     } elseif ($sitesClient) {
-                        // Sinon, filtrer par site
+                        // Si un site est pré-rempli, filtrer par site
                         $qb->where('c.sitesClient = :site')
                            ->setParameter('site', $sitesClient);
+                    } else {
+                        // Aucune pré-sélection : liste vide, le JS gèrera
+                        $qb->where('1 = 0');
                     }
                     return $qb->orderBy('c.numero', 'ASC');
                 },
@@ -145,9 +167,12 @@ class InterventionType extends AbstractType
                         $qb->where('z.id = :zoneId')
                            ->setParameter('zoneId', $zonesClient->getId());
                     } elseif ($sitesClient) {
-                        // Sinon, filtrer par site
+                        // Si un site est pré-rempli, filtrer par site
                         $qb->where('z.sitesClient = :site')
                            ->setParameter('site', $sitesClient);
+                    } else {
+                        // Aucune pré-sélection : liste vide, le JS gèrera
+                        $qb->where('1 = 0');
                     }
                     return $qb->orderBy('z.nom', 'ASC');
                 },
