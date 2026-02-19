@@ -6,47 +6,24 @@
     <h1>Actions</h1>
 
     <table class="table">
+        <thead>
+            <th>Code</th>
+            <th>Nom</th>
+        </thead>
+
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ action.id }}</td>
-            </tr>
-            <tr>
-                <th>Meo Produit</th>
-                <td>{{ action.meoProduit ? action.meoProduit.id : '' }}</td>
-            </tr>
-            <tr>
-                <th>Interventions</th>
-                <td>
-                    {% if action.intervention is not empty %}
-                        <ul>
-                            {% for inter in action.intervention %}
-                                <li>
-                                    <a href="{{ path('app_intervention_show', {'id': inter.id}) }}">
-                                        Intervention #{{ inter.id }}
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        Aucune intervention
-                    {% endif %}
-                </td>
-            </tr>
-            <tr>
-                <th>Necessaires</th>
-                <td>
-                    {% if action.necessaire is not empty %}
-                        <ul>
-                            {% for nec in action.necessaire %}
-                                <li>{{ nec.id }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        Aucun necessaire
-                    {% endif %}
-                </td>
-            </tr>
+        <td>
+        {% for necessaire in action.necessaire %}
+            <hr>{{necessaire.code}}<br>
+            {% endfor %}
+        </td>
+        <td>
+            {% for necessaire in action.necessaire %}
+            <hr>{{necessaire.nom}}<br>
+            
+            {% endfor %}
+        </td>
+
         </tbody>
     </table>
 

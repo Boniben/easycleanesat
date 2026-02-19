@@ -9,7 +9,6 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Nom Tache</th>
                 <th>Tache</th>
                 <th>Support</th>
                 <th>Matériel</th>
@@ -27,8 +26,7 @@
             <tr>
                 <td>{{ action.id }}</td>
                 {% for necessaire in action.necessaire %}
-                <td>{{necessaire.nom}}</td>
-                <td> {{necessaire.code}} </td>
+                <td>{{necessaire.code}} </td>
                 {% endfor %}
 
                 <!--<td>{{dump(action)}}</td>-->
