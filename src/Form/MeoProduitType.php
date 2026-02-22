@@ -43,7 +43,9 @@ class MeoProduitType extends AbstractType
             ])
             ->add('contenant', EntityType::class, [
                 'class' => Contenant::class,
-                'choice_label' => 'nom',
+                'choice_label' => function(Contenant $contenant) {
+                    return sprintf('%s - %s', $contenant->getNom(), $contenant->getVolumeEau());
+                },
             ])
             ->add('uniteVolume', EntityType::class, [
                 'class' => UniteVolume::class,

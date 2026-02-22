@@ -1,11 +1,11 @@
-{% extends 'base.html.twig' %}
+﻿{% extends 'base.html.twig' %}
 
-{% block title %}Edit Produit{% endblock %}
+{% block title %}Modifier Produit{% endblock %}
 
 {% block body %}
-    <h1>Edit Produit {{ include('produit/_deactivate_form.html.twig') }}</h1>
+    <h1>Modifier Produit {{ include('produit/_deactivate_form.html.twig') }}</h1>
 
     {{ include('produit/_form.html.twig', {'button_label': 'Modifier'}) }}
 
-    <a href="{{ path('app_produit_index') }}">Retour à la liste</a>
+    <a href="{{ path('app_produit_index') }}">Retour Ã  la liste</a>
 {% endblock %}

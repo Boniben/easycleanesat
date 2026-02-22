@@ -1,13 +1,13 @@
-{% extends 'base.html.twig' %}
+﻿{% extends 'base.html.twig' %}
 
-{% block title %}Edit Contenant{% endblock %}
+{% block title %}Modifier Contenant{% endblock %}
 
 {% block body %}
-    <h1>Edit Contenant</h1>
+    <h1>Modifier Contenant</h1>
 
-    {{ include('contenant/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('contenant/_form.html.twig', {'button_label': 'Mettre a jour'}) }}
 
-    <a href="{{ path('app_contenant_index') }}">back to list</a>
+    <a href="{{ path('app_contenant_index') }}">Retour a la liste</a>
 
     {{ include('contenant/_delete_form.html.twig') }}
 {% endblock %}

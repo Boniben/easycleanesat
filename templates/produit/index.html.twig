@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Produit index{% endblock %}
+{% block title %}Produit{% endblock %}
 
 {% block body %}
-    <h1>Produit index</h1>
-
-    <div class="mb-3">
-        <a href="{{ path('app_produit_new') }}" class="btn btn-success btn-lg">+ Créer un nouveau produit</a>
-        <a href="{{ path('app_produit_inactif') }}" class="btn btn-warning">Consulter les produits désactivés</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>Produit</h1>
+        <a href="{{ path('app_produit_new') }}" class="btn btn-success" style="font-size: 16px; padding: 10px 20px;">+ Créer</a>
     </div>
+
+    <a href="{{ path('app_produit_inactif') }}" class="btn btn-warning" style="margin-bottom: 15px;">Consulter les produits désactivés</a>
 
     <table class="table">
         <thead>
@@ -17,7 +17,7 @@
                 <th>Code</th>
                 <th>Nom</th>
                 <th>Couleur</th>
-                
+
                 <th>actions</th>
             </tr>
         </thead>
@@ -28,7 +28,7 @@
                 <td>{{ produit.code }}</td>
                 <td>{{ produit.nom }}</td>
                 <td>{{ produit.couleur }}</td>
-                
+
                 <td>
                     <a href="{{ path('app_produit_show', {'id': produit.id}) }}">Afficher</a>
                     <a href="{{ path('app_produit_edit', {'id': produit.id}) }}">Modifier</a>
@@ -36,7 +36,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="5">no records found</td>
+                <td colspan="5">Aucun enregistrement trouvé</td>
             </tr>
         {% endfor %}
         </tbody>

@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+﻿{% extends 'base.html.twig' %}
 
 {% block title %}TempsContact index{% endblock %}
 
@@ -21,8 +21,8 @@
                 <td>{{ temps_contact.tempsContact }}</td>
                 <td>{{ temps_contact.picto }}</td>
                 <td>
-                    <a href="{{ path('app_temps_contact_show', {'id': temps_contact.id}) }}">show</a>
-                    <a href="{{ path('app_temps_contact_edit', {'id': temps_contact.id}) }}">edit</a>
+                    <a href="{{ path('app_temps_contact_show', {'id': temps_contact.id}) }}">Afficher</a>
+                    <a href="{{ path('app_temps_contact_edit', {'id': temps_contact.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -33,5 +33,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_temps_contact_new') }}">Create new</a>
+    <a href="{{ path('app_temps_contact_new') }}">Creer</a>
 {% endblock %}
