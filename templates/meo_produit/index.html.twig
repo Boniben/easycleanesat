@@ -3,7 +3,7 @@
 {% block title %}MeoProduit index{% endblock %}
 
 {% block body %}
-    <h1>MeoProduit index</h1>
+    <h1>Liste des mise en oeuvre produit</h1>
 
     <table class="table">
         <thead>
@@ -35,8 +35,8 @@
                 <td>{{ meo_produit.moyenDosage ? meo_produit.moyenDosage.nom : '-' }}</td>
                 <td>{{ meo_produit.volumeProduit }}</td>
                 <td>
-                    <a href="{{ path('app_meo_produit_show', {'id': meo_produit.id}) }}">show</a>
-                    <a href="{{ path('app_meo_produit_edit', {'id': meo_produit.id}) }}">edit</a>
+                    <a href="{{ path('app_meo_produit_show', {'id': meo_produit.id}) }}">Afficher</a>
+                    <a href="{{ path('app_meo_produit_edit', {'id': meo_produit.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
