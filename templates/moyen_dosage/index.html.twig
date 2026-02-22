@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+﻿{% extends 'base.html.twig' %}
 
 {% block title %}MoyenDosage index{% endblock %}
 
@@ -23,8 +23,8 @@
                 <td>{{ moyen_dosage.code }}</td>
                 <td>{{ moyen_dosage.picto }}</td>
                 <td>
-                    <a href="{{ path('app_moyen_dosage_show', {'id': moyen_dosage.id}) }}">show</a>
-                    <a href="{{ path('app_moyen_dosage_edit', {'id': moyen_dosage.id}) }}">edit</a>
+                    <a href="{{ path('app_moyen_dosage_show', {'id': moyen_dosage.id}) }}">Afficher</a>
+                    <a href="{{ path('app_moyen_dosage_edit', {'id': moyen_dosage.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -35,5 +35,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_moyen_dosage_new') }}">Create new</a>
+    <a href="{{ path('app_moyen_dosage_new') }}">Creer</a>
 {% endblock %}

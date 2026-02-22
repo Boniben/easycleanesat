@@ -1,15 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}MeoProduit index{% endblock %}
+{% block title %}MeoProduit{% endblock %}
 
 {% block body %}
-    <h1>MeoProduit index</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>Mise en œuvre produit</h1>
+        <a href="{{ path('app_meo_produit_new') }}" class="btn btn-success" style="font-size: 16px; padding: 10px 20px;">+ Créer</a>
+    </div>
+
+    <a href="{{ path('app_meo_produit_inactif') }}" class="btn btn-warning" style="margin-bottom: 15px;">Consulter les mises en œuvre désactivées</a>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Code Meo produit</td>
+                <th>Code Meo produit</th>
                 <th>Nom produit</th>
                 <th>Nom contenant</th>
                 <th>Nom moyen dilution</th>
@@ -22,12 +27,12 @@
             <tr>
                 <td>{{ meo_produit.id }}</td>
                 <td>
-                {{ 
-                    (meo_produit.produit ? meo_produit.produit.code : '') 
-                    ~ '.0' ~ 
-                    (meo_produit.contenant ? meo_produit.contenant.id : '0') 
-                    ~ '.' ~ 
-                    (meo_produit.moyenDosage ? meo_produit.moyenDosage.code : '00') 
+                {{
+                    (meo_produit.produit ? meo_produit.produit.code : '')
+                    ~ '.0' ~
+                    (meo_produit.contenant ? meo_produit.contenant.id : '0')
+                    ~ '.' ~
+                    (meo_produit.moyenDosage ? meo_produit.moyenDosage.code : '00')
                 }}
                 </td>
                 <td>{{ meo_produit.produit ? meo_produit.produit.nom : '-' }}</td>
@@ -35,17 +40,15 @@
                 <td>{{ meo_produit.moyenDosage ? meo_produit.moyenDosage.nom : '-' }}</td>
                 <td>{{ meo_produit.volumeProduit }}</td>
                 <td>
-                    <a href="{{ path('app_meo_produit_show', {'id': meo_produit.id}) }}">show</a>
-                    <a href="{{ path('app_meo_produit_edit', {'id': meo_produit.id}) }}">edit</a>
+                    <a href="{{ path('app_meo_produit_show', {'id': meo_produit.id}) }}">Afficher</a>
+                    <a href="{{ path('app_meo_produit_edit', {'id': meo_produit.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="7">no records found</td>
+                <td colspan="7">Aucun enregistrement trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_meo_produit_new') }}">Create new</a>
 {% endblock %}
