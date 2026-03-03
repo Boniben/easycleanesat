@@ -3,7 +3,7 @@
 {% block title %}Modifier Necessaire{% endblock %}
 
 {% block body %}
-    <h1>Modifier Necessaire</h1>
+    <h1>Modifier Nécessaire {{ include('necessaire/_deactivate_form.html.twig') }}</h1>
 
     {{ include('necessaire/_form.html.twig', {'button_label': 'Mettre a jour'}) }}
 
