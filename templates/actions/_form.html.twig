@@ -69,14 +69,15 @@
 
 {{ form_start(form) }}
     <div class="row">
-        <div class="col-md-12 mb-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Produit et Dosage</h5>
-                    {{ form_row(form.meo_produit) }}
+        <div class="col-md-8">
+            <div class="col-md-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Produit et Dosage</h5>
+                        {{ form_row(form.meo_produit) }}
+                    </div>
                 </div>
             </div>
-        </div>
 
         <div class="col-md-12 mb-3">
             <div class="card h-100">
@@ -108,6 +109,26 @@
                 </div>
             </div>
         </div>
+        </div>
+
+        <!-- Colonne de preview -->
+        <div class="col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="card-title">Aperçu</h5>
+                    <div id="action-preview" style="border: solid 1px black; padding: 0; background-color: white;">
+                        <div style="border-bottom: solid 1px black; padding: 8px;">
+                            <div id="preview-tache-nom" style="font-weight: bold; margin-bottom: 8px; text-align: center; min-height: 20px;"></div>
+                            <div id="preview-tache-img" style="width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center;"></div>
+                        </div>
+                        <div style="display: flex; padding: 4px;">
+                            <div id="preview-necessaires" style="display: grid; grid-template-columns: repeat(2, 40px); gap: 2px;"></div>
+                            <div id="preview-meo" style="margin-left: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div style="display: none;">
@@ -120,35 +141,112 @@
 {{ form_end(form) }}
 
 <script>
-    // Fonction de recherche pour chaque bloc de nécessaires
-    document.querySelectorAll('.necessaire-search').forEach(searchInput => {
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const typeId = this.dataset.type;
-            const list = document.querySelector(`.necessaire-list[data-type="${typeId}"]`);
-            const items = list.querySelectorAll('.necessaire-item');
+    // Attendre que le DOM soit complètement chargé
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chemin de base pour les assets
+        const assetBasePath = "{{ asset('PictoNecessairePNG/') }}";
+
+        // Données des nécessaires pour la preview
+        const necessairesData = {};
+        document.querySelectorAll('.necessaire-item').forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const label = item.querySelector('label');
+            if (checkbox && label) {
+                const necessaireId = checkbox.value;
+                const typeBloc = item.closest('.necessaire-bloc');
+                const typeId = typeBloc.dataset.typeId;
+                const typeName = typeBloc.querySelector('h6').textContent;
+                const parts = label.textContent.split(' - ');
+                necessairesData[necessaireId] = {
+                    id: necessaireId,
+                    code: parts[0].trim(),
+                    nom: parts[1] ? parts[1].trim() : parts[0].trim(),
+                    typeId: typeId,
+                    typeName: typeName.toLowerCase()
+                };
+            }
+        });
+
+        // Fonction pour mettre à jour la preview
+        function updatePreview() {
+            const checked = document.querySelectorAll('.necessaire-item input[type="checkbox"]:checked');
+            const tacheNom = document.getElementById('preview-tache-nom');
+            const tacheImg = document.getElementById('preview-tache-img');
+            const necessairesDiv = document.getElementById('preview-necessaires');
             
-            items.forEach(item => {
-                const itemName = item.dataset.name;
-                if (itemName.includes(searchTerm)) {
-                    item.style.display = 'block';
+            // Reset
+            tacheNom.textContent = '';
+            tacheImg.innerHTML = '';
+            necessairesDiv.innerHTML = '';
+            
+            checked.forEach(checkbox => {
+                const data = necessairesData[checkbox.value];
+                if (!data) return;
+                
+                if (data.typeId == 4) { // Tâche
+                    tacheNom.textContent = data.nom;
+                    tacheImg.innerHTML = `<img src="${assetBasePath}${data.code}.png" 
+                        onerror="this.style.display='none'" 
+                        style="width: 80px; height: 80px; object-fit: contain;">`;
                 } else {
-                    item.style.display = 'none';
+                    const filename = data.typeName === 'consommable' ? '_' + data.code : data.code;
+                    necessairesDiv.innerHTML += `<img src="${assetBasePath}${filename}.png" 
+                        onerror="this.style.display='none'" 
+                        style="width: 40px; height: 40px; object-fit: contain; border: 1px solid #ccc;">`;
                 }
             });
-        });
-    });
+        }
 
-    // Fonction "Tout décocher" pour chaque bloc
-    document.querySelectorAll('.btn-uncheck-all').forEach(button => {
-        button.addEventListener('click', function() {
-            const typeId = this.dataset.type;
-            const list = document.querySelector(`.necessaire-list[data-type="${typeId}"]`);
-            const checkboxes = list.querySelectorAll('input[type="checkbox"]');
-            
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = false;
+        // Limitation à 1 checkbox par type
+        document.querySelectorAll('.necessaire-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    const typeBloc = this.closest('.necessaire-bloc');
+                    const otherCheckboxes = typeBloc.querySelectorAll('.necessaire-item input[type="checkbox"]');
+                    otherCheckboxes.forEach(other => {
+                        if (other !== this) {
+                            other.checked = false;
+                        }
+                    });
+                }
+                updatePreview();
             });
         });
+
+        // Fonction de recherche pour chaque bloc de nécessaires
+        document.querySelectorAll('.necessaire-search').forEach(searchInput => {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const typeId = this.dataset.type;
+                const list = document.querySelector(`.necessaire-list[data-type="${typeId}"]`);
+                const items = list.querySelectorAll('.necessaire-item');
+                
+                items.forEach(item => {
+                    const itemName = item.dataset.name;
+                    if (itemName.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Fonction "Tout décocher" pour chaque bloc
+        document.querySelectorAll('.btn-uncheck-all').forEach(button => {
+            button.addEventListener('click', function() {
+                const typeId = this.dataset.type;
+                const list = document.querySelector(`.necessaire-list[data-type="${typeId}"]`);
+                const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+                
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                updatePreview();
+            });
+        });
+
+        // Initialiser la preview au chargement avec les valeurs déjà cochées
+        updatePreview();
     });
 </script>
