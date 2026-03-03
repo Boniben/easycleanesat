@@ -28,7 +28,7 @@ class ZonesClient
      * @var Collection<int, SupportClient>
      */
     #[ORM\OneToMany(targetEntity: SupportClient::class, mappedBy: 'zonesClient')]
-    private Collection $supportClients;
+    private Collection $supportsClient;
 
     /**
      * @var Collection<int, Intervention>
