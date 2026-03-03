@@ -59,30 +59,81 @@
         {{ form_errors(form.dureeMinute) }}
     </div>
     
-    {{ form_row(form.elementSecurites) }}
-    
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <div class="form-group">
+        <label>Éléments de sécurité</label>
+        {{ form_widget(form.elementSecurites, {'attr': {'class': 'tile-select-hidden', 'id': 'tile-select-elementSecurites', 'style': 'display:none!important'}}) }}
+        {{ form_errors(form.elementSecurites) }}
+        <div class="tile-grid" id="es-tile-grid">
+            {% for choice in form.elementSecurites.vars.choices %}
+                <div class="tile-item{% if choice.value in form.elementSecurites.vars.value %} selected{% endif %}"
+                     data-tile-value="{{ choice.value }}"
+                     onclick="esTileToggle(this)">
+                    {% set pictoFile = choice.data.picto ? choice.data.picto : (choice.data.id ~ '.png') %}
+                    <img src="{{ asset('PictoElementSecuritePNG/' ~ pictoFile) }}" alt="{{ choice.label }}" class="tile-picto" onerror="this.style.display='none'">
+                    <span>{{ choice.label }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
 
 <style>
-.duree-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.duree-container { display: flex; align-items: center; gap: 10px; }
+.duree-input { width: 80px; padding: 8px; font-size: 1.2em; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+.duree-separator { font-size: 1.5em; font-weight: bold; color: #333; }
+.tile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.4rem;
 }
-
-.duree-input {
-    width: 80px;
-    padding: 8px;
-    font-size: 1.2em;
+.tile-item {
+    padding: 0.5rem 0.6rem;
+    border: 2px solid #d0d4db;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
     text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    cursor: pointer !important;
+    user-select: none;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    color: #1e2028;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
 }
-
-.duree-separator {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #333;
+.tile-picto {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+}
+.tile-item:hover {
+    border-color: #3d5a80;
+    background: #dce4ed;
+    color: #2c4460;
+}
+.tile-item.selected {
+    border-color: #3d5a80 !important;
+    background: #3d5a80 !important;
+    color: #fff !important;
+    box-shadow: 0 2px 8px rgba(61,90,128,0.35);
 }
 </style>
+
+<script>
+function esTileToggle(tile) {
+    var isNow = !tile.classList.contains('selected');
+    tile.classList.toggle('selected', isNow);
+    var select = document.getElementById('tile-select-elementSecurites');
+    if (!select) return;
+    var val = tile.getAttribute('data-tile-value');
+    Array.from(select.options).forEach(function(opt) {
+        if (opt.value === val) opt.selected = isNow;
+    });
+}
+</script>
