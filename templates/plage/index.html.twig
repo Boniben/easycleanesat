@@ -10,7 +10,7 @@
             <tr>
                 <th>Id</th>
                 <th>HeureDebut</th>
-                <th>HeurFin</th>
+                <th>Heure de fin</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -19,7 +19,7 @@
             <tr>
                 <td>{{ plage.id }}</td>
                 <td>{{ plage.heureDebut ? plage.heureDebut|date('H:i:s') : '' }}</td>
-                <td>{{ plage.heurFin ? plage.heurFin|date('H:i:s') : '' }}</td>
+                <td>{{ plage.heureFin ? plage.heureFin|date('H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('app_plage_show', {'id': plage.id}) }}">Afficher</a>
                     <a href="{{ path('app_plage_edit', {'id': plage.id}) }}">Modifier</a>
