@@ -34,6 +34,12 @@ class MeoProduitType extends AbstractType
                 'choice_label' => function(Produit $produit) {
                     return sprintf('%s - %s', $produit->getCode(), $produit->getNom());
                 },
+                'choice_attr' => function (Produit $produit): array {
+                    return [
+                        'data-code' => $produit->getCode() ?? '',
+                        'data-color' => $produit->getCouleur() ?? '',
+                    ];
+                },
                 'query_builder' => function () {
                     return $this->produitRepository->createQueryBuilder('p')
                         ->andWhere('p.actif = :actif')
@@ -46,17 +52,40 @@ class MeoProduitType extends AbstractType
                 'choice_label' => function(Contenant $contenant) {
                     return sprintf('%s - %s', $contenant->getNom(), $contenant->getVolumeEau());
                 },
+                'choice_attr' => function (Contenant $contenant): array {
+                    return [
+                        'data-id' => (string) ($contenant->getId() ?? ''),
+                        'data-volume' => $contenant->getVolumeEau() !== null ? (string) $contenant->getVolumeEau() : '',
+                        'data-unit' => $contenant->getUniteVolume()?->getNom() ?? '',
+                    ];
+                },
             ])
             ->add('uniteVolume', EntityType::class, [
                 'class' => UniteVolume::class,
                 'choice_label' => 'nom',
+                'choice_attr' => function (UniteVolume $uniteVolume): array {
+                    return [
+                        'data-unit' => $uniteVolume->getNom() ?? '',
+                    ];
+                },
             ])
             ->add('moyenDosage', EntityType::class, [
                 'class' => MoyenDosage::class,
                 'choice_label' => 'nom',
+                'choice_attr' => function (MoyenDosage $moyenDosage): array {
+                    return [
+                        'data-id' => (string) ($moyenDosage->getId() ?? ''),
+                        'data-code' => $moyenDosage->getCode() ?? '',
+                    ];
+                },
             ])
             ->add('tempsContact', EntityType::class, [
                 'class' => TempsContact::class,
+                'choice_attr' => function (TempsContact $tempsContact): array {
+                    return [
+                        'data-id' => (string) ($tempsContact->getId() ?? ''),
+                    ];
+                },
             ])
         ;
     }

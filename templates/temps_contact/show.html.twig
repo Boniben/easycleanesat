@@ -1,9 +1,9 @@
-﻿{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}TempsContact{% endblock %}
+{% block title %}Temps de contact{% endblock %}
 
 {% block body %}
-    <h1>TempsContact</h1>
+    <h1>Temps de contact</h1>
 
     <table class="table">
         <tbody>
@@ -12,12 +12,14 @@
                 <td>{{ temps_contact.id }}</td>
             </tr>
             <tr>
-                <th>TempsContact</th>
+                <th>Temps de contact</th>
                 <td>{{ temps_contact.tempsContact }}</td>
             </tr>
             <tr>
                 <th>Picto</th>
-                <td>{{ temps_contact.picto }}</td>
+                <td>
+                    <img src="{{ asset('PictoTempContactPNG/' ~ temps_contact.id ~ '.png') }}" alt="Picto {{ temps_contact.tempsContact }}" style="max-height: 80px;">
+                </td>
             </tr>
         </tbody>
     </table>

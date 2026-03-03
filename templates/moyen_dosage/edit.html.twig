@@ -1,9 +1,11 @@
-﻿{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Modifier MoyenDosage{% endblock %}
+{% block title %}Modifier Moyen de dosage{% endblock %}
 
 {% block body %}
-    <h1>Modifier MoyenDosage</h1>
+    <h1>Modifier Moyen de dosage</h1>
+
+    <p><strong>Picto actuel :</strong> {{ moyen_dosage.picto ?: '-' }}</p>
 
     {{ include('moyen_dosage/_form.html.twig', {'button_label': 'Mettre a jour'}) }}
 
