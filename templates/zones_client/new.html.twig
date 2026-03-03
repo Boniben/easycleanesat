@@ -9,7 +9,7 @@
 	</div>
 
 	<div class="form-card">
-		{{ form_start(form, {'attr': {'id': 'zone-form'}}) }}
+		{{ form_start(form, {'attr': {'id': 'zone-form', 'data-turbo': 'false'}}) }}
 		<div class="form-row">
 			{{ form_label(form.nom) }}
 			{{ form_widget(form.nom) }}
@@ -101,10 +101,12 @@ card.addEventListener('mouseenter', () => {
 if (selectedId != item.id) 
 card.style.borderColor = 'var(--color-primary)';
 
+
 });
 card.addEventListener('mouseleave', () => {
 if (selectedId != item.id) 
 card.style.borderColor = 'var(--color-border)';
+
 
 });
 

@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\TypeSupportRepository;
 
 #[Route('/api')]
 class ApiController extends AbstractController
@@ -77,5 +78,18 @@ class ApiController extends AbstractController
         }, $zones);
 
         return $this->json($data);
+    }
+    #[Route('/type-support/search', name: 'api_type_support_search', methods: ['GET'])]
+    public function searchTypeSupport(Request $request, TypeSupportRepository $typeSupportRepository): JsonResponse
+    {
+        $query = trim($request->query->get('q', ''));
+
+        if ($query === '') {
+            $results = [];
+        } else {
+            $results = $typeSupportRepository->searchByNomOrDescription($query);
+        }
+
+        return $this->json($results);
     }
 }
