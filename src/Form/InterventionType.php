@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Range;
 
 class InterventionType extends AbstractType
 {
@@ -188,8 +189,14 @@ class InterventionType extends AbstractType
                     'max' => 6,
                 ],
             ])
-            ->add('dureeHeure')
-            ->add('dureeMinute')
+            ->add('dureeHeure', IntegerType::class, [
+                'attr' => ['min' => 0, 'max' => 24],
+                'constraints' => [new Range(['min' => 0, 'max' => 24])],
+            ])
+            ->add('dureeMinute', IntegerType::class, [
+                'attr' => ['min' => 0, 'max' => 59],
+                'constraints' => [new Range(['min' => 0, 'max' => 59])],
+            ])
             ->add('elementSecurites', EntityType::class, [
                 'class' => ElementSecurite::class,
                 'choice_label' => 'nom',

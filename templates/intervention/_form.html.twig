@@ -53,7 +53,7 @@
     {{ form_row(form.nbTravailleur) }}
     
     <div class="form-group">
-        <label>Durée</label>
+        <label>Durée recommandé de l'intervention</label>
         <div class="duree-container">
             {{ form_widget(form.dureeHeure, {'attr': {'class': 'duree-input'}}) }}
             <span class="duree-separator">:</span>
@@ -62,7 +62,53 @@
         {{ form_errors(form.dureeHeure) }}
         {{ form_errors(form.dureeMinute) }}
     </div>
-    
+
+    <div class="form-group">
+        <label>Plages horaires de travail</label>
+        <table class="plage-table">
+            <thead>
+                <tr>
+                    <th colspan="2"></th>
+                    {% for jour in jours %}
+                        <th>{{ jour.nom }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="2" class="plage-period">Matin</td>
+                    <td class="plage-label">Arrivé</td>
+                    {% for jour in jours %}
+                        {% set val = plagesMap[jour.id]['matin'] is defined ? plagesMap[jour.id]['matin'].heureDebut|date('H:i') : '' %}
+                        <td><input type="time" name="plage[{{ jour.id }}][matin][debut]" class="plage-input" min="00:00" max="13:00" value="{{ val }}"></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="plage-label">Départ</td>
+                    {% for jour in jours %}
+                        {% set val = plagesMap[jour.id]['matin'] is defined ? plagesMap[jour.id]['matin'].heureFin|date('H:i') : '' %}
+                        <td><input type="time" name="plage[{{ jour.id }}][matin][fin]" class="plage-input" min="00:00" max="13:00" value="{{ val }}"></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td rowspan="2" class="plage-period">Après-midi</td>
+                    <td class="plage-label">Arrivé</td>
+                    {% for jour in jours %}
+                        {% set val = plagesMap[jour.id]['apmidi'] is defined ? plagesMap[jour.id]['apmidi'].heureDebut|date('H:i') : '' %}
+                        <td><input type="time" name="plage[{{ jour.id }}][apmidi][debut]" class="plage-input" min="13:00" max="23:59" value="{{ val }}"></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="plage-label">Départ</td>
+                    {% for jour in jours %}
+                        {% set val = plagesMap[jour.id]['apmidi'] is defined ? plagesMap[jour.id]['apmidi'].heureFin|date('H:i') : '' %}
+                        <td><input type="time" name="plage[{{ jour.id }}][apmidi][fin]" class="plage-input" min="13:00" max="23:59" value="{{ val }}"></td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <div class="form-group">
         <label>Éléments de sécurité</label>
         {{ form_widget(form.elementSecurites, {'attr': {'class': 'tile-select-hidden', 'id': 'tile-select-elementSecurites', 'style': 'display:none!important'}}) }}
@@ -88,6 +134,44 @@
 .duree-input { width: 80px; padding: 8px; font-size: 1.2em; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
 .duree-separator { font-size: 1.5em; font-weight: bold; color: #333; }
 .date-input { width: 190px !important; }
+.plage-table {
+    border-collapse: collapse;
+    margin-top: 0.4rem;
+    font-size: 0.88rem;
+}
+.plage-table th, .plage-table td {
+    border: 1px solid #d0d4db;
+    padding: 0.35rem 0.6rem;
+    text-align: center;
+    white-space: nowrap;
+}
+.plage-table thead th {
+    background: var(--color-bg-alt, #f0f2f5);
+    font-weight: 700;
+    color: var(--color-text, #1e2028);
+}
+.plage-period {
+    font-weight: 700;
+    background: var(--color-bg-alt, #f0f2f5);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    padding: 0.5rem 0.3rem;
+}
+.plage-label {
+    font-weight: 600;
+    text-align: left;
+    padding-left: 0.7rem;
+    color: #555;
+}
+.plage-input {
+    width: 90px;
+    padding: 3px 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-align: center;
+}
 .tile-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));

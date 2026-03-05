@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Intervention;
+use App\Entity\JourDeLaSemaine;
+use App\Entity\Plage;
 use App\Form\InterventionType;
 use App\Repository\InterventionRepository;
+use App\Repository\JourDeLaSemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +37,7 @@ final class InterventionController extends AbstractController
      * Sans paramètres : formulaire vierge avec listes déroulantes dynamiques (AJAX/Stimulus)
      */
     #[Route('/new', name: 'app_intervention_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository): Response
     {
         $intervention = new Intervention();
         
@@ -57,14 +60,38 @@ final class InterventionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($intervention);
+
+            // Traitement des plages horaires
+            $plageData = $request->request->all('plage') ?? [];
+            foreach ($plageData as $jourId => $periods) {
+                $jour = $jourRepository->find($jourId);
+                if (!$jour) continue;
+                foreach (['matin', 'apmidi'] as $period) {
+                    $debut = $periods[$period]['debut'] ?? '';
+                    $fin   = $periods[$period]['fin']   ?? '';
+                    if ($debut !== '' && $fin !== '') {
+                        $plage = new Plage();
+                        $plage->setHeureDebut(new \DateTime($debut));
+                        $plage->setHeureFin(new \DateTime($fin));
+                        $plage->setIntervention($intervention);
+                        $plage->setJourDeLaSemaine($jour);
+                        $entityManager->persist($plage);
+                    }
+                }
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_intervention_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $jours = $jourRepository->findBy([], ['id' => 'ASC']);
+
         return $this->render('intervention/new.html.twig', [
             'intervention' => $intervention,
-            'form' => $form,
+            'form'         => $form,
+            'jours'        => $jours,
+            'plagesMap'    => [],
         ]);
     }
 
@@ -77,7 +104,7 @@ final class InterventionController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_intervention_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Intervention $intervention, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Intervention $intervention, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository): Response
     {
         $zonesClient = $intervention->getZonesClient();
         $contrat     = $intervention->getContrat();
@@ -92,14 +119,51 @@ final class InterventionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $intervention->setDateModificaion(new \DateTime());
             $intervention->setNumVersion(($intervention->getNumVersion() ?? 1) + 1);
+
+            // Supprimer les anciennes plages
+            foreach ($intervention->getPlages() as $oldPlage) {
+                $entityManager->remove($oldPlage);
+            }
+
+            // Recréer les plages depuis le formulaire
+            $plageData = $request->request->all('plage') ?? [];
+            foreach ($plageData as $jourId => $periods) {
+                $jour = $jourRepository->find($jourId);
+                if (!$jour) continue;
+                foreach (['matin', 'apmidi'] as $period) {
+                    $debut = $periods[$period]['debut'] ?? '';
+                    $fin   = $periods[$period]['fin']   ?? '';
+                    if ($debut !== '' && $fin !== '') {
+                        $plage = new Plage();
+                        $plage->setHeureDebut(new \DateTime($debut));
+                        $plage->setHeureFin(new \DateTime($fin));
+                        $plage->setIntervention($intervention);
+                        $plage->setJourDeLaSemaine($jour);
+                        $entityManager->persist($plage);
+                    }
+                }
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_intervention_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $jours = $jourRepository->findBy([], ['id' => 'ASC']);
+
+        // Construire la map des plages existantes : [jourId][matin|apmidi] => Plage
+        $plagesMap = [];
+        foreach ($intervention->getPlages() as $plage) {
+            $jourId = $plage->getJourDeLaSemaine()->getId();
+            $period = ((int)$plage->getHeureDebut()->format('H') < 12) ? 'matin' : 'apmidi';
+            $plagesMap[$jourId][$period] = $plage;
+        }
+
         return $this->render('intervention/edit.html.twig', [
             'intervention' => $intervention,
-            'form' => $form,
+            'form'         => $form,
+            'jours'        => $jours,
+            'plagesMap'    => $plagesMap,
         ]);
     }
 
