@@ -3,9 +3,11 @@
 {% block title %}Creer Actions{% endblock %}
 
 {% block body %}
-    <h1>CrÃ©er une nouvelle action</h1>
+    <div class="container-fluid">
+        <h1>Créer une nouvelle action</h1>
 
-    {{ include('actions/_form.html.twig') }}
+        {{ include('actions/_form.html.twig') }}
 
-    <a href="{{ path('app_actions_index') }}">Retour a la liste</a>
+        <a href="{{ path('app_actions_index') }}">Retour a la liste</a>
+    </div>
 {% endblock %}

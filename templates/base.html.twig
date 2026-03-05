@@ -375,7 +375,7 @@
 				font-size: 0.85rem;
 				color: var(--color-primary-hover);
 			}
-			input,
+			input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
 			select,
 			textarea {
 				width: 100%;
@@ -388,7 +388,7 @@
 				background: rgba(255, 255, 255, 0.6);
 				transition: border-color var(--transition), box-shadow var(--transition);
 			}
-			input:focus,
+			input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):focus,
 			select:focus,
 			textarea:focus {
 				outline: none;

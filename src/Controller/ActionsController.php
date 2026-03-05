@@ -6,6 +6,7 @@ use App\Entity\Actions;
 use App\Form\ActionsType;
 use App\Repository\ActionsRepository;
 use App\Repository\TypeNecessaireRepository;
+use App\Repository\MeoProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +33,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/new', name: 'app_actions_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository, MeoProduitRepository $meoProduitRepository): Response
     {
         $action = new Actions();
         $form = $this->createForm(ActionsType::class, $action);
@@ -46,11 +47,42 @@ final class ActionsController extends AbstractController
         }
 
         $typesNecessaires = $typeNecessaireRepository->findAll();
+        
+        // Récupérer tous les MEO produits actifs avec leurs relations
+        $meoProduits = $meoProduitRepository->findBy(['actif' => true]);
+        $meoProduitsData = [];
+        foreach ($meoProduits as $meo) {
+            $meoProduitsData[$meo->getId()] = [
+                'id' => $meo->getId(),
+                'volume' => $meo->getVolumeProduit(),
+                'uniteVolume' => $meo->getUniteVolume() ? $meo->getUniteVolume()->getNom() : null,
+                'produit' => $meo->getProduit() ? [
+                    'code' => $meo->getProduit()->getCode(),
+                    'nom' => $meo->getProduit()->getNom(),
+                    'couleur' => $meo->getProduit()->getCouleur()
+                ] : null,
+                'contenant' => $meo->getContenant() ? [
+                    'id' => $meo->getContenant()->getId(),
+                    'nom' => $meo->getContenant()->getNom(),
+                    'volumeEau' => $meo->getContenant()->getVolumeEau(),
+                    'uniteVolumeEau' => $meo->getContenant()->getUniteVolume() ? $meo->getContenant()->getUniteVolume()->getNom() : null
+                ] : null,
+                'moyenDosage' => $meo->getMoyenDosage() ? [
+                    'id' => $meo->getMoyenDosage()->getId(),
+                    'code' => $meo->getMoyenDosage()->getCode()
+                ] : null,
+                'tempsContact' => $meo->getTempsContact() ? [
+                    'id' => $meo->getTempsContact()->getId(),
+                    'temps' => $meo->getTempsContact()->getTempsContact()
+                ] : null,
+            ];
+        }
 
         return $this->render('actions/new.html.twig', [
             'action' => $action,
             'form' => $form,
             'typesNecessaires' => $typesNecessaires,
+            'meoProduitsData' => json_encode($meoProduitsData),
         ]);
     }
 
@@ -63,7 +95,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_actions_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Actions $action, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository): Response
+    public function edit(Request $request, Actions $action, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository, MeoProduitRepository $meoProduitRepository): Response
     {
         $form = $this->createForm(ActionsType::class, $action);
         $form->handleRequest($request);
@@ -75,11 +107,42 @@ final class ActionsController extends AbstractController
         }
 
         $typesNecessaires = $typeNecessaireRepository->findAll();
+        
+        // Récupérer tous les MEO produits actifs avec leurs relations
+        $meoProduits = $meoProduitRepository->findBy(['actif' => true]);
+        $meoProduitsData = [];
+        foreach ($meoProduits as $meo) {
+            $meoProduitsData[$meo->getId()] = [
+                'id' => $meo->getId(),
+                'volume' => $meo->getVolumeProduit(),
+                'uniteVolume' => $meo->getUniteVolume() ? $meo->getUniteVolume()->getNom() : null,
+                'produit' => $meo->getProduit() ? [
+                    'code' => $meo->getProduit()->getCode(),
+                    'nom' => $meo->getProduit()->getNom(),
+                    'couleur' => $meo->getProduit()->getCouleur()
+                ] : null,
+                'contenant' => $meo->getContenant() ? [
+                    'id' => $meo->getContenant()->getId(),
+                    'nom' => $meo->getContenant()->getNom(),
+                    'volumeEau' => $meo->getContenant()->getVolumeEau(),
+                    'uniteVolumeEau' => $meo->getContenant()->getUniteVolume() ? $meo->getContenant()->getUniteVolume()->getNom() : null
+                ] : null,
+                'moyenDosage' => $meo->getMoyenDosage() ? [
+                    'id' => $meo->getMoyenDosage()->getId(),
+                    'code' => $meo->getMoyenDosage()->getCode()
+                ] : null,
+                'tempsContact' => $meo->getTempsContact() ? [
+                    'id' => $meo->getTempsContact()->getId(),
+                    'temps' => $meo->getTempsContact()->getTempsContact()
+                ] : null,
+            ];
+        }
 
         return $this->render('actions/edit.html.twig', [
             'action' => $action,
             'form' => $form,
             'typesNecessaires' => $typesNecessaires,
+            'meoProduitsData' => json_encode($meoProduitsData),
         ]);
     }
 
