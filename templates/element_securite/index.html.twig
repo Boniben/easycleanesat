@@ -20,7 +20,12 @@
             <tr>
                 <td>{{ element_securite.id }}</td>
                 <td>{{ element_securite.nom }}</td>
-                <td>{{ element_securite.picto }}</td>
+                <td>
+                    {% set pictoFile = element_securite.picto ? element_securite.picto : (element_securite.id ~ '.png') %}
+                    <div class="tile-item-display">
+                        <img src="{{ asset('PictoElementSecuritePNG/' ~ pictoFile) }}" alt="{{ element_securite.nom }}" class="tile-picto" onerror="this.style.display='none'">
+                    </div>
+                </td>
                 <td>
 
                     {{ action_buttons('app_element_securite_show', 'app_element_securite_edit', element_securite.id) }}
@@ -36,4 +41,22 @@
     </table>
 
     <a href="{{ path('app_element_securite_new') }}">Creer</a>
+
+<style>
+.tile-item-display {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem 0.6rem;
+    border: 2px solid #d0d4db;
+    border-radius: 6px;
+    background: #fff;
+}
+.tile-picto {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+}
+</style>
 {% endblock %}
