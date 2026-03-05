@@ -45,7 +45,11 @@
         {{ form_errors(form.zonesClient) }}
     </div>
     {{ form_row(form.redacteur) }}
-    {{ form_row(form.dateCreation) }}
+    <div class="form-group">
+        {{ form_label(form.dateCreation) }}
+        {{ form_widget(form.dateCreation, {'attr': {'class': 'date-input'}}) }}
+        {{ form_errors(form.dateCreation) }}
+    </div>
     {{ form_row(form.nbTravailleur) }}
     
     <div class="form-group">
@@ -83,6 +87,7 @@
 .duree-container { display: flex; align-items: center; gap: 10px; }
 .duree-input { width: 80px; padding: 8px; font-size: 1.2em; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
 .duree-separator { font-size: 1.5em; font-weight: bold; color: #333; }
+.date-input { width: 190px !important; }
 .tile-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));

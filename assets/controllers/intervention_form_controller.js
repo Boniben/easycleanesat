@@ -36,6 +36,22 @@ export default class extends Controller {
      */
     connect() {
         console.log('Intervention form controller connected');
+
+        const clientVal = this.clientTarget.value;
+
+        if (!clientVal) {
+            // Aucun client pré-sélectionné : vider et désactiver site/contrat/zone
+            this.resetSelect(this.siteTarget);
+            this.resetSelect(this.contratTarget);
+            this.resetSelect(this.zoneTarget);
+        } else {
+            // Client déjà sélectionné (ex: retour sur le formulaire avec erreur)
+            const siteVal = this.siteTarget.value;
+            if (!siteVal) {
+                this.resetSelect(this.contratTarget);
+                this.resetSelect(this.zoneTarget);
+            }
+        }
     }
 
     /**

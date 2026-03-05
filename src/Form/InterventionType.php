@@ -180,9 +180,7 @@ class InterventionType extends AbstractType
             ])
             ->add('dateCreation', DateType::class, [
                 'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'attr' => ['placeholder' => 'jj/mm/aaaa'],
+                'html5' => true,
             ])
             ->add('nbTravailleur', IntegerType::class, [
                 'attr' => [
