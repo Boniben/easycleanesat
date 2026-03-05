@@ -12,7 +12,9 @@ class TypeZoneType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom');
+            ->add('nom')
+            ->add('description')
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
