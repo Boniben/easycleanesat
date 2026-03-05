@@ -1,21 +1,27 @@
 {% extends 'base.html.twig' %}
-{% block title %}Type de zone
+{% block title %}
+	{{ type_zone.nom }}
 {% endblock %}
 {% block body %}
 	<div class="page-header">
 		<h1>{{ type_zone.nom }}</h1>
 	</div>
 	<div class="card">
-		<ul class="info-list">
-			<li>
-				<span class="info-label">Nom :</span>
-				<span>{{ type_zone.nom }}</span>
-			</li>
-			<li>
-				<span class="info-label">Description :</span>
-				<span>{{ type_zone.description ?? 'Aucune' }}</span>
-			</li>
-		</ul>
+		<div style="display: flex; align-items: center; gap: 20px;">
+			{% if type_zone.picto %}
+				<img src="{{ asset('PictoTypeZonePNG/' ~ type_zone.picto) }}" alt="{{ type_zone.nom }}" style="max-height: 100px;">
+			{% endif %}
+			<ul class="info-list" style="flex:1;">
+				<li>
+					<span class="info-label">Nom :</span>
+					<span>{{ type_zone.nom }}</span>
+				</li>
+				<li>
+					<span class="info-label">Description :</span>
+					<span>{{ type_zone.description ?? 'Aucune' }}</span>
+				</li>
+			</ul>
+		</div>
 	</div>
 	<div class="btn-group mt-3">
 		<a href="{{ path('app_type_zone_index') }}" class="btn btn-secondary">Retour a la liste</a>

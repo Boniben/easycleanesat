@@ -24,6 +24,9 @@ class TypeZone
     #[ORM\OneToMany(targetEntity: ZonesClient::class, mappedBy: 'typeZone')]
     private Collection $zonesClients;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $picto = null;
+
     public function __construct()
     {
         $this->zonesClients = new ArrayCollection();
@@ -83,5 +86,17 @@ class TypeZone
     public function __toString(): string
     {
         return $this->nom ?? '';
+    }
+
+    public function getPicto(): ?string
+    {
+        return $this->picto;
+    }
+
+    public function setPicto(?string $picto): static
+    {
+        $this->picto = $picto;
+
+        return $this;
     }
 }

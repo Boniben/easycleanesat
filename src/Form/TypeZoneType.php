@@ -4,8 +4,10 @@ namespace App\Form;
 
 use App\Entity\TypeZone;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 class TypeZoneType extends AbstractType
 {
@@ -14,6 +16,17 @@ class TypeZoneType extends AbstractType
         $builder
             ->add('nom')
             ->add('description')
+            ->add('pictoFile', FileType::class, [
+                'label' => 'Pictogramme (PNG)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new Image([
+                        'maxSize' => '2M',
+                        'mimeTypes' => ['image/png', 'image/jpeg'],
+                    ]),
+                ],
+            ])
         ;
     }
 
