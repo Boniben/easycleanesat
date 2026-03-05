@@ -16,26 +16,42 @@ class MeoProduitRepository extends ServiceEntityRepository
         parent::__construct($registry, MeoProduit::class);
     }
 
-    public function findAllActif(): array
+    public function findAllActif(?int $produitId = null): array
     {
-        return $this->createQueryBuilder('m')
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->leftJoin('m.produit', 'p')
             ->andWhere('m.actif = :actif')
             ->setParameter('actif', true)
-            ->orderBy('m.id', 'ASC')
+            ->orderBy('m.id', 'ASC');
+
+        if ($produitId !== null) {
+            $queryBuilder
+                ->andWhere('p.id = :produitId')
+                ->setParameter('produitId', $produitId);
+        }
+
+        return $queryBuilder
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
-    public function findAllInactif(): array
+    public function findAllInactif(?int $produitId = null): array
     {
-        return $this->createQueryBuilder('m')
+        $queryBuilder = $this->createQueryBuilder('m')
+            ->leftJoin('m.produit', 'p')
             ->andWhere('m.actif = :actif')
             ->setParameter('actif', false)
-            ->orderBy('m.id', 'ASC')
+            ->orderBy('m.id', 'ASC');
+
+        if ($produitId !== null) {
+            $queryBuilder
+                ->andWhere('p.id = :produitId')
+                ->setParameter('produitId', $produitId);
+        }
+
+        return $queryBuilder
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
 
     //    /**

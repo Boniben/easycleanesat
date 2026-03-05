@@ -92,7 +92,16 @@ final class ProduitController extends AbstractController
     public function toggleActif(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('toggle_actif'.$produit->getId(), $request->getPayload()->getString('_token'))) {
-            $produit->setActif(!$produit->isActif());
+            $shouldDeactivate = $produit->isActif();
+
+            $produit->setActif(!$shouldDeactivate);
+
+            if ($shouldDeactivate) {
+                foreach ($produit->getMeoProduits() as $meoProduit) {
+                    $meoProduit->setActif(false);
+                }
+            }
+
             $entityManager->flush();
         }
 

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\MeoProduit;
 use App\Form\MeoProduitType;
 use App\Repository\MeoProduitRepository;
+use App\Repository\ProduitRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,18 +16,34 @@ use Symfony\Component\Routing\Attribute\Route;
 final class MeoProduitController extends AbstractController
 {
     #[Route(name: 'app_meo_produit_index', methods: ['GET'])]
-    public function index(MeoProduitRepository $meoProduitRepository): Response
+    public function index(Request $request, MeoProduitRepository $meoProduitRepository, ProduitRepository $produitRepository): Response
     {
+        $selectedProduitId = $request->query->getInt('produit');
+
+        if ($selectedProduitId <= 0) {
+            $selectedProduitId = null;
+        }
+
         return $this->render('meo_produit/index.html.twig', [
-            'meo_produits' => $meoProduitRepository->findAllActif(),
+            'meo_produits' => $meoProduitRepository->findAllActif($selectedProduitId),
+            'produits' => $produitRepository->findBy([], ['id' => 'ASC']),
+            'selected_produit_id' => $selectedProduitId,
         ]);
     }
 
     #[Route('/inactif', name: 'app_meo_produit_inactif', methods: ['GET'])]
-    public function indexInactif(MeoProduitRepository $meoProduitRepository): Response
+    public function indexInactif(Request $request, MeoProduitRepository $meoProduitRepository, ProduitRepository $produitRepository): Response
     {
+        $selectedProduitId = $request->query->getInt('produit');
+
+        if ($selectedProduitId <= 0) {
+            $selectedProduitId = null;
+        }
+
         return $this->render('meo_produit/index_inactif.html.twig', [
-            'meo_produits' => $meoProduitRepository->findAllInactif(),
+            'meo_produits' => $meoProduitRepository->findAllInactif($selectedProduitId),
+            'produits' => $produitRepository->findBy([], ['id' => 'ASC']),
+            'selected_produit_id' => $selectedProduitId,
         ]);
     }
 

@@ -10,6 +10,24 @@
         <a href="{{ path('app_meo_produit_index') }}" class="btn btn-success">Retour aux mises en œuvre actives</a>
     </div>
 
+    <form method="get" action="{{ path('app_meo_produit_inactif') }}" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px;">
+        <div>
+            <label for="meo-produit-inactif-filter-produit" style="display: block; margin-bottom: 4px;">Filtrer par produit</label>
+            <select id="meo-produit-inactif-filter-produit" name="produit" class="form-select">
+                <option value="">Tous les produits</option>
+                {% for produit in produits %}
+                    <option value="{{ produit.id }}" {% if selected_produit_id == produit.id %}selected{% endif %}>
+                        {{ produit.code }} - {{ produit.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        {% if selected_produit_id %}
+            <a href="{{ path('app_meo_produit_inactif') }}" class="btn btn-outline-secondary">Reinitialiser</a>
+        {% endif %}
+    </form>
+
     <table class="table">
         <thead>
             <tr>
