@@ -21,7 +21,13 @@
             </tr>
             <tr>
                 <th>Picto</th>
-                <td>{{ contenant.picto }}</td>
+                <td>
+                    {% if contenant.picto %}
+                        <img src="{{ asset('PictoContenantPNG/' ~ contenant.picto) }}" alt="Picto {{ contenant.nom }}" style="max-height: 80px;">
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
             </tr>
         </tbody>
     </table>
