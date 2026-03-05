@@ -92,6 +92,31 @@ final class NecessaireController extends AbstractController
     {
         if ($this->isCsrfTokenValid('toggle_actif'.$necessaire->getId(), $request->getPayload()->getString('_token'))) {
             $necessaire->setActif(!$necessaire->isActif());
+            
+            if (!$necessaire->isActif()) {
+            $actionsLiees = $necessaire->getActions(); // Récupère directement les actions via la relation
+            $nbActionsDesactivees = 0;
+            
+            foreach ($actionsLiees as $action) {
+                if ($action->isActif()) {
+                    $action->setActif(false);
+                    $entityManager->persist($action);
+                    $nbActionsDesactivees++;
+                }
+            }
+            
+            if ($nbActionsDesactivees > 0) {
+                $this->addFlash('warning', sprintf(
+                    'Le nécessaire a été désactivé. %d action(s) lié(es) ont également été désactivée(s).',
+                    $nbActionsDesactivees
+                ));
+            } else {
+                $this->addFlash('success', 'Le nécessaire a été désactivé (aucune action liée).');
+            }
+        } else {
+            $this->addFlash('success', 'Le nécessaire a été réactivé.');
+        }
+            
             $entityManager->flush();
         }
 
