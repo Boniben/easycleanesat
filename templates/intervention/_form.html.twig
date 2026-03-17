@@ -115,12 +115,19 @@
         {{ form_errors(form.elementSecurites) }}
         <div class="tile-grid" id="es-tile-grid">
             {% for choice in form.elementSecurites.vars.choices %}
-                <div class="tile-item{% if choice.value in form.elementSecurites.vars.value %} selected{% endif %}"
+                {% set isT21 = (choice.label == '0') %}
+                <div class="tile-item{% if choice.value in form.elementSecurites.vars.value or isT21 %} selected{% endif %}"
                      data-tile-value="{{ choice.value }}"
-                     onclick="esTileToggle(this)">
-                    {% set pictoFile = choice.data.picto ? choice.data.picto : (choice.data.id ~ '.png') %}
-                    <img src="{{ asset('PictoElementSecuritePNG/' ~ pictoFile) }}" alt="{{ choice.label }}" class="tile-picto" onerror="this.style.display='none'">
-                    <span>{{ choice.label }}</span>
+                     onclick="esTileToggle(this)"
+                     {% if isT21 %}data-auto-select="true"{% endif %}>
+                    {% if isT21 %}
+                        <img src="{{ asset('PictoNecessairePNG/T.21.png') }}" alt="T.21" class="tile-picto" onerror="this.style.display='none'">
+                        <span>T.21</span>
+                    {% else %}
+                        {% set pictoFile = choice.data.picto ? choice.data.picto : (choice.data.id ~ '.png') %}
+                        <img src="{{ asset('PictoElementSecuritePNG/' ~ pictoFile) }}" alt="{{ choice.label }}" class="tile-picto" onerror="this.style.display='none'">
+                        <span>{{ choice.label }}</span>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
@@ -225,4 +232,15 @@ function esTileToggle(tile) {
         if (opt.value === val) opt.selected = isNow;
     });
 }
+document.addEventListener('DOMContentLoaded', function() {
+    var autoTiles = document.querySelectorAll('[data-auto-select="true"]');
+    var select = document.getElementById('tile-select-elementSecurites');
+    if (!select) return;
+    autoTiles.forEach(function(tile) {
+        var val = tile.getAttribute('data-tile-value');
+        Array.from(select.options).forEach(function(opt) {
+            if (opt.value === val) opt.selected = true;
+        });
+    });
+});
 </script>
