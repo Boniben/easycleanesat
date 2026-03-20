@@ -12,6 +12,7 @@
 			<p class="text-muted text-sm">Détail du client et de ses sites</p>
 		</div>
 		<div class="btn-group">
+			<a href="{{ path('app_intervention_new', {'client_id': client.id}) }}" class="btn btn-success">+ Nouvelle intervention</a>
 			{% if app.user and is_granted('ROLE_ADMIN') %}
 				<a href="{{ path('app_sites_client_new', {'client_id': client.id}) }}" class="btn btn-primary">+ Ajouter un site</a>
 				<a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-secondary">Modifier</a>
@@ -24,9 +25,9 @@
 			<div class="card-header">
 				<h2>{{ site.nom }}</h2>
 				<div class="btn-group">
-					<a href="{{ path('app_zones_client_new', {'site_id': site.id}) }}" class="btn btn-primary">Ajouter une zone</a>
+					<a href="{{ path('app_zones_client_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Zone</a>
 					{% if app.user and is_granted('ROLE_ADMIN') %}
-						<a href="{{ path('app_contrat_new', {'site_id': site.id}) }}" class="btn btn-primary">Ajouter un contrat</a>
+						<a href="{{ path('app_contrat_new', {'site_id': site.id}) }}" class="btn btn-outline btn-sm">+ Contrat</a>
 					{% endif %}
 				</div>
 			</div>
@@ -69,18 +70,9 @@
 		</div>
 	{% endfor %}
 
-	<section class="dashboard-actions">
-		<a class="dashboard-action" href="{{ path('app_intervention_new', {'client_id': client.id}) }}">
-			<strong>Ajouter une intervention</strong>
-			<span>Créer une nouvelle intervention pour
-				{{ client.nom }}.</span>
-		</a>
-	</section>
-
 	<div class="btn-group mt-3">
 		<a href="{{ path('app_client_index') }}" class="btn btn-secondary">← Retour à la liste</a>
 		{% if app.user and is_granted('ROLE_ADMIN') %}
-			<a href="{{ path('app_client_edit', {'id': client.id}) }}" class="btn btn-secondary">Modifier</a>
 			{{ include('client/_delete_form.html.twig') }}
 		{% endif %}
 	</div>

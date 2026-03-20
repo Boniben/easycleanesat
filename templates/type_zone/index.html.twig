@@ -1,47 +1,41 @@
 {% extends 'base.html.twig' %}
+{% from '_macros/action_buttons.html.twig' import action_buttons %}
+
 {% block title %}Types de zone
 {% endblock %}
+
 {% block body %}
-	<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+	<div class="page-header">
 		<h1>Types de zone</h1>
-		<a href="{{ path('app_type_zone_new') }}" class="btn btn-primary">+ Creer</a>
+		{% if app.user and is_granted('ROLE_ADMIN') %}
+			<a href="{{ path('app_type_zone_new') }}" class="btn btn-primary">+ Ajouter un type</a>
+		{% endif %}
 	</div>
 
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Picto</th>
-				<th>Nom</th>
-				<th>Description</th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for type_zone in type_zones %}
+	<div class="table-wrapper">
+		<table>
+			<thead>
 				<tr>
-					<td>{{ type_zone.id }}</td>
-					<td>
-						{% if type_zone.picto %}
-							<img src="{{ asset('PictoTypeZonePNG/' ~ type_zone.picto) }}" alt="{{ type_zone.nom }}" style="max-height: 40px;">
-						{% else %}
-							-
-						{% endif %}
-					</td>
-					<td>{{ type_zone.nom }}</td>
-					<td>{{ type_zone.description ?? '' }}</td>
-					<td>
-						<div class="btn-group">
-							<a href="{{ path('app_type_zone_show', {'id': type_zone.id}) }}" class="btn btn-secondary">Voir</a>
-							<a href="{{ path('app_type_zone_edit', {'id': type_zone.id}) }}" class="btn btn-secondary">Modifier</a>
-						</div>
-					</td>
+					<th>#</th>
+					<th>Nom</th>
+					<th>Actions</th>
 				</tr>
-			{% else %}
-				<tr>
-					<td colspan="5">Aucun type de zone</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{% for type_zone in type_zones %}
+					<tr>
+						<td>{{ loop.index }}</td>
+						<td>{{ type_zone.nom }}</td>
+						<td>
+						{{ action_buttons('app_type_zone_show', 'app_type_zone_edit', type_zone.id, true) }}
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="3">Aucun type de zone trouvé</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 {% endblock %}

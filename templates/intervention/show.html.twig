@@ -37,15 +37,15 @@
             </tr>
             <tr>
                 <th>Redacteur</th>
-                <td>{{ intervention.redacteur ? intervention.redacteur.id : '' }}</td>
+                <td>{{ intervention.redacteur ? intervention.redacteur.initial : '' }}</td>
             </tr>
             <tr>
                 <th>ZonesClient</th>
-                <td>{{ intervention.zonesClient ? intervention.zonesClient.id : '' }}</td>
+                <td>{{ intervention.zonesClient ? intervention.zonesClient.nom : '' }}</td>
             </tr>
             <tr>
                 <th>Contrat</th>
-                <td>{{ intervention.contrat ? intervention.contrat.id : '' }}</td>
+                <td>{{ intervention.contrat ? intervention.contrat.numero : '' }}</td>
             </tr>
         </tbody>
     </table>

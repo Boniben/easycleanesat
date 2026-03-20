@@ -1,3 +1,4 @@
+{% from '_macros/action_buttons.html.twig' import action_buttons %}
 ﻿{% extends 'base.html.twig' %}
 
 {% block title %}Vigilance index{% endblock %}
@@ -21,8 +22,9 @@
                 <td>{{ vigilance.definition }}</td>
                 <td>{{ vigilance.picto }}</td>
                 <td>
-                    <a href="{{ path('app_vigilance_show', {'id': vigilance.id}) }}">Afficher</a>
-                    <a href="{{ path('app_vigilance_edit', {'id': vigilance.id}) }}">Modifier</a>
+
+                    {{ action_buttons('app_vigilance_show', 'app_vigilance_edit', vigilance.id) }}
+
                 </td>
             </tr>
         {% else %}

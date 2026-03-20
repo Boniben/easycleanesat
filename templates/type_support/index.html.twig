@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% from '_macros/action_buttons.html.twig' import action_buttons %}
 
 {% block title %}Types de support
 {% endblock %}
@@ -26,12 +27,7 @@
 						<td>{{ loop.index }}</td>
 						<td>{{ type_support.nom }}</td>
 						<td>
-							<div class="btn-group">
-								<a href="{{ path('app_type_support_show', {'id': type_support.id}) }}" class="btn btn-outline btn-sm">Voir</a>
-								{% if app.user and is_granted('ROLE_ADMIN') %}
-									<a href="{{ path('app_type_support_edit', {'id': type_support.id}) }}" class="btn btn-secondary btn-sm">Modifier</a>
-								{% endif %}
-							</div>
+						{{ action_buttons('app_type_support_show', 'app_type_support_edit', type_support.id, true) }}
 						</td>
 					</tr>
 				{% else %}

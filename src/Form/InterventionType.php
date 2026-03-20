@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Range;
 
 class InterventionType extends AbstractType
 {
@@ -98,6 +99,7 @@ class InterventionType extends AbstractType
                         $qb->where('c.id = :clientId')
                            ->setParameter('clientId', $client->getId());
                     }
+                    // Pas de filtre sinon : on accepte tous les clients (JS gère l'affichage)
                     return $qb->orderBy('c.nom', 'ASC');
                 },
             ])
@@ -120,10 +122,8 @@ class InterventionType extends AbstractType
                         // CAS 2 : Filtrage par client (depuis client_id)
                         $qb->where('s.client = :client')
                            ->setParameter('client', $client);
-                    } else {
-                        // CAS 3 : Aucune pré-sélection, liste vide (Stimulus gère)
-                        $qb->where('1 = 0');
                     }
+                    // Pas de filtre sinon : on accepte tous les sites (JS gère l'affichage)
                     return $qb->orderBy('s.nom', 'ASC');
                 },
             ])
@@ -145,10 +145,8 @@ class InterventionType extends AbstractType
                         // Si un site est pré-rempli, filtrer par site
                         $qb->where('c.sitesClient = :site')
                            ->setParameter('site', $sitesClient);
-                    } else {
-                        // Aucune pré-sélection : liste vide, le JS gèrera
-                        $qb->where('1 = 0');
                     }
+                    // Pas de filtre sinon : on accepte tous les contrats (JS gère l'affichage)
                     return $qb->orderBy('c.numero', 'ASC');
                 },
             ])
@@ -170,10 +168,8 @@ class InterventionType extends AbstractType
                         // Si un site est pré-rempli, filtrer par site
                         $qb->where('z.sitesClient = :site')
                            ->setParameter('site', $sitesClient);
-                    } else {
-                        // Aucune pré-sélection : liste vide, le JS gèrera
-                        $qb->where('1 = 0');
                     }
+                    // Pas de filtre sinon : on accepte toutes les zones (JS gère l'affichage)
                     return $qb->orderBy('z.nom', 'ASC');
                 },
             ])
@@ -185,9 +181,7 @@ class InterventionType extends AbstractType
             ])
             ->add('dateCreation', DateType::class, [
                 'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'attr' => ['placeholder' => 'jj/mm/aaaa'],
+                'html5' => true,
             ])
             ->add('nbTravailleur', IntegerType::class, [
                 'attr' => [
@@ -195,8 +189,14 @@ class InterventionType extends AbstractType
                     'max' => 6,
                 ],
             ])
-            ->add('dureeHeure')
-            ->add('dureeMinute')
+            ->add('dureeHeure', IntegerType::class, [
+                'attr' => ['min' => 0, 'max' => 24],
+                'constraints' => [new Range(['min' => 0, 'max' => 24])],
+            ])
+            ->add('dureeMinute', IntegerType::class, [
+                'attr' => ['min' => 0, 'max' => 59],
+                'constraints' => [new Range(['min' => 0, 'max' => 59])],
+            ])
             ->add('elementSecurites', EntityType::class, [
                 'class' => ElementSecurite::class,
                 'choice_label' => 'nom',

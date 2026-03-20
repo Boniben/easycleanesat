@@ -1,3 +1,4 @@
+{% from '_macros/action_buttons.html.twig' import action_buttons %}
 ﻿{% extends 'base.html.twig' %}
 
 {% block title %}Necessaire index{% endblock %}
@@ -28,8 +29,9 @@
                 <td>{{ necessaire.code }}</td>
                 <td>{{ necessaire.typeNecessaire ? necessaire.typeNecessaire.nom : '' }}</td>
                 <td>
-                    <a href="{{ path('app_necessaire_show', {'id': necessaire.id}) }}">Afficher</a>
-                    <a href="{{ path('app_necessaire_edit', {'id': necessaire.id}) }}">Modifier</a>
+
+                    {{ action_buttons('app_necessaire_show', 'app_necessaire_edit', necessaire.id) }}
+
                 </td>
             </tr>
         {% else %}
