@@ -1,21 +1,27 @@
 {% extends 'base.html.twig' %}
-{% block title %}Type de support
+{% block title %}
+	{{ type_support.nom }}
 {% endblock %}
 {% block body %}
 	<div class="page-header">
 		<h1>{{ type_support.nom }}</h1>
 	</div>
 	<div class="card">
-		<ul class="info-list">
-			<li>
-				<span class="info-label">Nom :</span>
-				<span>{{ type_support.nom }}</span>
-			</li>
-			<li>
-				<span class="info-label">Description :</span>
-				<span>{{ type_support.description ?? 'Aucune' }}</span>
-			</li>
-		</ul>
+		<div style="display: flex; align-items: center; gap: 20px;">
+			{% if type_support.picto %}
+				<img src="{{ asset('PictoTypeSupportPNG/' ~ type_support.picto) }}" alt="{{ type_support.nom }}" style="max-height: 100px;">
+			{% endif %}
+			<ul class="info-list" style="flex:1;">
+				<li>
+					<span class="info-label">Nom :</span>
+					<span>{{ type_support.nom }}</span>
+				</li>
+				<li>
+					<span class="info-label">Description :</span>
+					<span>{{ type_support.description ?? 'Aucune' }}</span>
+				</li>
+			</ul>
+		</div>
 	</div>
 	<div class="btn-group mt-3">
 		<a href="{{ path('app_type_support_index') }}" class="btn btn-secondary">Retour a la liste</a>
