@@ -201,18 +201,47 @@ final class InterventionController extends AbstractController
     private function buildActionsJson(ActionsRepository $actionsRepository): string
     {
         $actions = $actionsRepository->findAllActif();
-        $data = array_map(function (Actions $action) {
-            $label = 'Action #' . $action->getId();
-            foreach ($action->getNecessaire() as $nec) {
-                if ($nec->getTypeNecessaire() && $nec->getTypeNecessaire()->getId() === 4) {
-                    $label = $nec->getNom();
-                    break;
-                }
-            }
-            return ['id' => $action->getId(), 'label' => $label];
-        }, $actions);
+        $data = array_map(fn(Actions $action) => $this->serializeAction($action), $actions);
 
         return json_encode($data, JSON_UNESCAPED_UNICODE);
+    }
+
+    private function serializeAction(Actions $action): array
+    {
+        $tache = null;
+        $necessaires = [];
+
+        foreach ($action->getNecessaire() as $nec) {
+            $typeId  = $nec->getTypeNecessaire()?->getId();
+            $typeNom = strtolower((string) $nec->getTypeNecessaire()?->getNom());
+            if ($typeId === 4) {
+                $tache = ['nom' => $nec->getNom(), 'code' => $nec->getCode()];
+            } else {
+                $necessaires[] = ['code' => $nec->getCode(), 'nom' => $nec->getNom(), 'type_nom' => $typeNom];
+            }
+        }
+
+        $meo = null;
+        if ($mp = $action->getMeoProduit()) {
+            $meo = [
+                'produit_code'      => $mp->getProduit()?->getCode(),
+                'produit_couleur'   => $mp->getProduit()?->getCouleur(),
+                'contenant_id'      => $mp->getContenant()?->getId(),
+                'volume_eau'        => $mp->getContenant()?->getVolumeEau(),
+                'moyen_dosage_id'   => $mp->getMoyenDosage()?->getId(),
+                'moyen_dosage_code' => $mp->getMoyenDosage()?->getCode(),
+                'volume_produit'    => $mp->getVolumeProduit(),
+                'temps_contact_id'  => $mp->getTempsContact()?->getId(),
+            ];
+        }
+
+        return [
+            'id'          => $action->getId(),
+            'label'       => $tache ? $tache['nom'] : ('Action #' . $action->getId()),
+            'tache'       => $tache,
+            'necessaires' => $necessaires,
+            'meo'         => $meo,
+        ];
     }
 
     private function buildSuppInterJson(Intervention $intervention): string
@@ -231,14 +260,8 @@ final class InterventionController extends AbstractController
             foreach ($suppInter->getActions() as $action) {
                 $aId = $action->getId();
                 if (!isset($actionsMap[$aId])) {
-                    $label = 'Action #' . $aId;
-                    foreach ($action->getNecessaire() as $nec) {
-                        if ($nec->getTypeNecessaire() && $nec->getTypeNecessaire()->getId() === 4) {
-                            $label = $nec->getNom();
-                            break;
-                        }
-                    }
-                    $actionsMap[$aId] = ['actionsId' => $aId, 'label' => $label, 'suppInterPositions' => []];
+                    $serialized = $this->serializeAction($action);
+                    $actionsMap[$aId] = array_merge($serialized, ['actionsId' => $aId, 'suppInterPositions' => []]);
                 }
                 $actionsMap[$aId]['suppInterPositions'][] = $pos;
             }

@@ -5,7 +5,11 @@
      data-supp-inter-supports-url-value="{{ path('api_supports_by_zone', {'zoneId': '__ZONE_ID__'}) }}"
      data-supp-inter-actions-value="{{ actionsJson|e('html_attr') }}"
      data-supp-inter-initial-data-value="{{ suppInterJson|e('html_attr') }}"
-     data-supp-inter-initial-zone-id-value="{{ initialZoneId ?? '' }}">
+     data-supp-inter-initial-zone-id-value="{{ initialZoneId ?? '' }}"
+     data-supp-inter-picto-url-value="{{ asset('PictoNecessairePNG/') }}"
+     data-supp-inter-contenant-url-value="{{ asset('PictoContenantPNG/') }}"
+     data-supp-inter-moyen-dosage-url-value="{{ asset('PictoMoyenDosagePNG/') }}"
+     data-supp-inter-temps-contact-url-value="{{ asset('PictoTempContactPNG/') }}">
 {{ form_start(form) }}
     <div{% if is_edit is defined and is_edit %} style="display:none"{% endif %}>
         {{ form_label(form.client) }}
@@ -63,12 +67,13 @@
         <div class="action-search-wrapper">
             <input type="text"
                    data-supp-inter-target="actionSearch"
-                   data-action="input->supp-inter#onActionSearchInput blur->supp-inter#onActionSearchBlur"
+                   data-action="input->supp-inter#onActionSearchInput blur->supp-inter#onActionSearchBlur focus->supp-inter#onActionSearchFocus click->supp-inter#onActionSearchFocus"
                    placeholder="Rechercher une action..."
                    class="action-search-input"
                    autocomplete="off">
             <div data-supp-inter-target="actionDropdown" class="action-dropdown" style="display:none"></div>
         </div>
+        <div data-supp-inter-target="filterChips" class="action-filter-chips"></div>
         <div data-supp-inter-target="actionsList" class="actions-list"></div>
     </div>
 
@@ -308,24 +313,33 @@
     position: absolute;
     top: 100%;
     left: 0;
-    right: 0;
+    min-width: 100%;
+    width: max-content;
+    max-width: 680px;
     background: #fff;
     border: 1px solid #ccc;
     border-top: none;
     border-radius: 0 0 4px 4px;
     z-index: 100;
-    max-height: 220px;
+    max-height: 340px;
     overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
-.action-dropdown-item {
-    padding: 8px 12px;
+.action-dropdown-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+}
+.action-dropdown-picto-item {
     cursor: pointer;
-    font-size: 0.88rem;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    transition: border-color 0.12s;
 }
-.action-dropdown-item:hover {
+.action-dropdown-picto-item:hover {
+    border-color: #3d5a80;
     background: #dce4ed;
-    color: #3d5a80;
 }
 .action-dropdown-empty {
     padding: 8px 12px;
@@ -334,53 +348,152 @@
 }
 .actions-list {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 0.6rem;
+    align-items: flex-start;
 }
 .action-row {
     border: 1px solid #d0d4db;
     border-radius: 6px;
     background: #f8f9fa;
     overflow: hidden;
+    width: 180px;
+    flex-shrink: 0;
 }
 .action-row-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 7px 12px;
+    padding: 6px 6px 4px !important;
     background: #eef1f5;
     border-bottom: 1px solid #d0d4db;
-    font-size: 0.88rem;
+    position: relative;
 }
 .action-remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
     border: none;
     background: none;
-    color: #888;
+    color: #aaa;
     cursor: pointer;
-    font-size: 1rem;
-    padding: 0 4px;
+    font-size: 0.9rem;
+    padding: 0;
     line-height: 1;
 }
 .action-remove-btn:hover { color: #c0392b; }
 .action-support-checks {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 7px 12px;
-    font-size: 0.85rem;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 8px;
+    font-size: 0.82rem;
 }
 .action-associate-label {
     color: #555;
     font-weight: 600;
-    margin-right: 0.2rem;
+    font-size: 0.78rem;
+    margin-bottom: 2px;
 }
 .action-support-check {
     display: flex;
     align-items: center;
     gap: 4px;
     cursor: pointer;
-    white-space: nowrap;
+}
+/* Carte picto action */
+.action-picto-card {
+    border: solid 1px #000;
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.action-picto-top {
+    border-bottom: solid 1px #000;
+    padding: 6px 8px;
+    text-align: center;
+}
+.action-picto-tache-nom {
+    font-weight: bold;
+    font-size: 0.78rem;
+    margin-bottom: 4px;
+}
+.action-picto-tache-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+.action-picto-bottom {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+}
+.action-picto-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 32px);
+    gap: 2px;
+}
+.action-picto-nec-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border: 1px solid #ccc;
+}
+/* Filtres nécessaires */
+.action-filter-chips {
+    margin-bottom: 0.8rem;
+}
+.filter-selects-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+}
+.filter-select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.filter-select-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.filter-list {
+    border: 1px solid #adb5bd;
+    border-radius: 4px;
+    min-width: 130px;
+    max-width: 200px;
+    max-height: 120px;
+    overflow-y: auto;
+    background: #fff;
+}
+.filter-list-item {
+    padding: 4px 8px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.1s;
+}
+.filter-list-item:last-child {
+    border-bottom: none;
+}
+.filter-list-item:hover {
+    background: #dce4ed;
+    color: #3d5a80;
+}
+.filter-list-item.active {
+    background: #3d5a80;
+    color: #fff;
+}
+.filter-list-item.active:hover {
+    background: #2d4a70;
 }
 </style>
 

@@ -7,7 +7,8 @@ import { Controller } from '@hotwired/stimulus';
  * - Chargement AJAX des supports selon la zone sélectionnée
  * - Toggle sélection des supports (style tile-card)
  * - Drag-and-drop natif HTML5 pour réordonner les supports sélectionnés
- * - Barre de recherche pour ajouter des actions
+ * - Barre de recherche pour ajouter des actions (tri starts-with en premier)
+ * - Filtres par code de nécessaire (t.X, SUP.X, MAT.X, REU.X, ACC.X, CON.X)
  * - Checkboxes pour associer chaque action aux supports sélectionnés
  * - Sérialisation JSON dans un champ hidden pour soumission au serveur
  */
@@ -19,6 +20,7 @@ export default class extends Controller {
         'actionsSection',
         'actionSearch',
         'actionDropdown',
+        'filterChips',
         'actionsList',
         'hiddenData',
     ];
@@ -28,12 +30,17 @@ export default class extends Controller {
         actions: Array,
         initialData: String,
         initialZoneId: String,
+        pictoUrl: String,
+        contenantUrl: String,
+        moyenDosageUrl: String,
+        tempsContactUrl: String,
     };
 
     // État interne
     allSupports = [];        // [{id, nom, type_support_id}] depuis l'API
     selectedSupports = [];   // [{supportClientId, orderPosition, nom}]
-    addedActions = [];       // [{actionsId, label, suppInterPositions: [1,2,...]}]
+    addedActions = [];       // [{actionsId, label, tache, necessaires, meo, suppInterPositions}]
+    activeFilters = [];      // codes de nécessaires actifs (ex: ['t.3', 'SUP.1'])
     dragSrcId = null;
     isDragging = false;
 
@@ -48,11 +55,17 @@ export default class extends Controller {
                     orderPosition: s.order_position,
                     nom: s.nom || '',
                 }));
-                this.addedActions = (parsed.actions || []).map(a => ({
-                    actionsId: a.actionsId,
-                    label: a.label || ('Action #' + a.actionsId),
-                    suppInterPositions: [...(a.suppInterPositions || [])],
-                }));
+                this.addedActions = (parsed.actions || []).map(a => {
+                    const full = this.actionsValue.find(av => av.id === a.actionsId) || {};
+                    return {
+                        actionsId: a.actionsId,
+                        label: full.label || a.label || ('Action #' + a.actionsId),
+                        tache: full.tache || a.tache || null,
+                        necessaires: full.necessaires || a.necessaires || [],
+                        meo: full.meo || a.meo || null,
+                        suppInterPositions: [...(a.suppInterPositions || [])],
+                    };
+                });
             } catch (e) {
                 console.error('supp_inter: erreur parsing initialData', e);
             }
@@ -63,6 +76,9 @@ export default class extends Controller {
         if (zoneId) {
             this.loadSupports(zoneId);
         }
+
+        // Rendre les chips de filtre (dépendent uniquement de actionsValue)
+        this.renderFilterSelects();
     }
 
     onZoneChange(event) {
@@ -71,7 +87,9 @@ export default class extends Controller {
         this.selectedSupports = [];
         this.addedActions = [];
         this.allSupports = [];
+        this.activeFilters = [];
         this.serialize();
+        this.renderFilterSelects();
 
         if (zoneId) {
             this.loadSupports(zoneId);
@@ -236,11 +254,6 @@ export default class extends Controller {
         [this.selectedSupports[srcIdx], this.selectedSupports[tgtIdx]] =
             [this.selectedSupports[tgtIdx], this.selectedSupports[srcIdx]];
 
-        // Recalculer les positions (ordre dans le tableau = ordre d'affichage)
-        this.selectedSupports.sort((a, b) => {
-            // Garder l'ordre après échange : la position de src est maintenant là où était tgt
-            return 0; // l'échange est déjà fait dans le tableau
-        });
         this.selectedSupports.forEach((s, i) => { s.orderPosition = i + 1; });
 
         const srcNewPos = this.selectedSupports[tgtIdx].orderPosition;
@@ -266,21 +279,185 @@ export default class extends Controller {
         this.dragSrcId = null;
     }
 
-    // ─── Barre de recherche d'actions ──────────────────────────────────────────
+    // ─── Filtres par code de nécessaire ────────────────────────────────────────
 
-    onActionSearchInput(event) {
-        const query = event.target.value.toLowerCase().trim();
-        if (!query) {
-            this.hideDropdown();
-            return;
-        }
+    /**
+     * Extrait tous les codes de nécessaires uniques depuis toutes les actions,
+     * groupés par prefix de code (t, SUP, MAT, REU, ACC, CON…).
+     * @returns {{ [prefix: string]: { label: string, items: Array<{code, nom}> } }}
+     */
+    _buildNecessaireGroups() {
+        const groups = {};
 
-        const filtered = this.actionsValue.filter(a =>
-            a.label.toLowerCase().includes(query) &&
+        this.actionsValue.forEach(action => {
+            // Tâche (typeId 4, stockée séparément)
+            if (action.tache) {
+                const code = action.tache.code;
+                const prefix = code.split('.')[0].toUpperCase();
+                if (!groups[prefix]) groups[prefix] = { label: 'Tâche', items: [] };
+                if (!groups[prefix].items.some(i => i.code === code)) {
+                    groups[prefix].items.push({ code, nom: action.tache.nom });
+                }
+            }
+            // Autres nécessaires
+            (action.necessaires || []).forEach(nec => {
+                const code = nec.code;
+                const prefix = code.split('.')[0].toUpperCase();
+                const label = nec.type_nom
+                    ? nec.type_nom.charAt(0).toUpperCase() + nec.type_nom.slice(1)
+                    : prefix;
+                if (!groups[prefix]) groups[prefix] = { label, items: [] };
+                if (!groups[prefix].items.some(i => i.code === code)) {
+                    groups[prefix].items.push({ code, nom: nec.nom || code });
+                }
+            });
+        });
+
+        // Trier les items dans chaque groupe par numéro
+        Object.values(groups).forEach(group => {
+            group.items.sort((a, b) => {
+                const numA = parseInt(a.code.split('.')[1]) || 0;
+                const numB = parseInt(b.code.split('.')[1]) || 0;
+                return numA - numB;
+            });
+        });
+
+        // Trier les groupes : T en premier, puis alphabétique
+        const orderedPrefixes = ['T', 'SUP', 'MAT', 'REU', 'ACC', 'CON'];
+        const sorted = {};
+        orderedPrefixes.forEach(p => { if (groups[p]) sorted[p] = groups[p]; });
+        Object.entries(groups).forEach(([p, g]) => { if (!sorted[p]) sorted[p] = g; });
+        return sorted;
+    }
+
+    renderFilterSelects() {
+        if (!this.hasFilterChipsTarget) return;
+        const container = this.filterChipsTarget;
+        container.innerHTML = '';
+
+        const groups = this._buildNecessaireGroups();
+        if (Object.keys(groups).length === 0) return;
+
+        const row = document.createElement('div');
+        row.className = 'filter-selects-row';
+
+        Object.entries(groups).forEach(([prefix, group]) => {
+            if (group.items.length === 0) return;
+
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'filter-select-group';
+
+            const label = document.createElement('div');
+            label.className = 'filter-select-label';
+            label.textContent = group.label;
+            groupDiv.appendChild(label);
+
+            const list = document.createElement('div');
+            list.className = 'filter-list';
+
+            group.items.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'filter-list-item' + (this.activeFilters.includes(item.code) ? ' active' : '');
+                itemEl.textContent = item.nom;
+                itemEl.dataset.code = item.code;
+
+                itemEl.addEventListener('click', () => {
+                    const prefix = item.code.split('.')[0].toUpperCase();
+                    const wasActive = this.activeFilters.includes(item.code);
+
+                    // Un seul choix par groupe : on vide d'abord tous les codes du même préfixe
+                    this.activeFilters = this.activeFilters.filter(c => c.split('.')[0].toUpperCase() !== prefix);
+
+                    // Si l'item n'était pas actif, on le sélectionne
+                    if (!wasActive) {
+                        this.activeFilters.push(item.code);
+                    }
+
+                    // Re-rendre pour mettre à jour l'état visuel du groupe
+                    this.renderFilterSelects();
+
+                    // Mettre à jour le dropdown s'il est visible
+                    if (this.hasActionDropdownTarget && this.actionDropdownTarget.style.display !== 'none') {
+                        const query = this.hasActionSearchTarget ? this.actionSearchTarget.value.toLowerCase().trim() : '';
+                        this._applySearch(query);
+                    }
+                });
+
+                list.appendChild(itemEl);
+            });
+
+            groupDiv.appendChild(list);
+            row.appendChild(groupDiv);
+        });
+
+        container.appendChild(row);
+    }
+
+    // ─── Pool filtré par chips actifs ──────────────────────────────────────────
+
+    /**
+     * Retourne les actions non encore ajoutées, filtrées par activeFilters.
+     * Logique : OR au sein d'un même prefix, AND entre prefixes différents.
+     */
+    _getFilteredPool() {
+        let pool = this.actionsValue.filter(a =>
             !this.addedActions.some(added => added.actionsId === a.id)
         );
 
+        if (this.activeFilters.length > 0) {
+            // Grouper les filtres actifs par prefix
+            const byPrefix = {};
+            this.activeFilters.forEach(code => {
+                const prefix = code.split('.')[0].toUpperCase();
+                if (!byPrefix[prefix]) byPrefix[prefix] = [];
+                byPrefix[prefix].push(code);
+            });
+
+            pool = pool.filter(a => {
+                // Codes disponibles dans l'action (tâche + nécessaires)
+                const codes = (a.necessaires || []).map(n => n.code);
+                if (a.tache) codes.push(a.tache.code);
+
+                // Pour chaque groupe de prefix : au moins un code du groupe doit matcher
+                return Object.values(byPrefix).every(groupCodes =>
+                    groupCodes.some(fc => codes.includes(fc))
+                );
+            });
+        }
+
+        return pool;
+    }
+
+    // ─── Recherche d'actions ────────────────────────────────────────────────────
+
+    _applySearch(query) {
+        let filtered = this._getFilteredPool();
+
+        if (query) {
+            filtered = filtered.filter(a => a.label.toLowerCase().includes(query));
+            // Trier : starts-with en premier, puis alphabétique
+            filtered.sort((a, b) => {
+                const aS = a.label.toLowerCase().startsWith(query);
+                const bS = b.label.toLowerCase().startsWith(query);
+                if (aS && !bS) return -1;
+                if (!aS && bS) return 1;
+                return a.label.localeCompare(b.label, 'fr');
+            });
+        } else {
+            filtered.sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+        }
+
         this.showDropdown(filtered);
+    }
+
+    onActionSearchFocus() {
+        const query = this.hasActionSearchTarget ? this.actionSearchTarget.value.toLowerCase().trim() : '';
+        this._applySearch(query);
+    }
+
+    onActionSearchInput(event) {
+        const query = event.target.value.toLowerCase().trim();
+        this._applySearch(query);
     }
 
     onActionSearchBlur() {
@@ -298,18 +475,24 @@ export default class extends Controller {
             empty.textContent = 'Aucune action trouvée';
             dropdown.appendChild(empty);
         } else {
-            actions.slice(0, 12).forEach(action => {
+            const grid = document.createElement('div');
+            grid.className = 'action-dropdown-grid';
+
+            actions.slice(0, 16).forEach(action => {
                 const item = document.createElement('div');
-                item.className = 'action-dropdown-item';
-                item.textContent = action.label;
+                item.className = 'action-dropdown-picto-item';
+                item.title = action.label;
+                item.appendChild(this._buildPictoCard(action));
                 item.addEventListener('mousedown', (e) => {
-                    e.preventDefault(); // éviter le blur avant le clic
+                    e.preventDefault();
                     this.addAction(action);
                     this.actionSearchTarget.value = '';
                     this.hideDropdown();
                 });
-                dropdown.appendChild(item);
+                grid.appendChild(item);
             });
+
+            dropdown.appendChild(grid);
         }
 
         dropdown.style.display = 'block';
@@ -326,8 +509,14 @@ export default class extends Controller {
         this.addedActions.push({
             actionsId: action.id,
             label: action.label,
+            tache: action.tache || null,
+            necessaires: action.necessaires || [],
+            meo: action.meo || null,
             suppInterPositions: [],
         });
+        // Réinitialiser les filtres après sélection d'une action
+        this.activeFilters = [];
+        this.renderFilterSelects();
         this.renderActionsList();
         this.serialize();
     }
@@ -367,13 +556,11 @@ export default class extends Controller {
             const row = document.createElement('div');
             row.className = 'action-row';
 
-            // En-tête de l'action
+            // En-tête de l'action : carte picto
             const header = document.createElement('div');
             header.className = 'action-row-header';
 
-            const title = document.createElement('strong');
-            title.textContent = action.label;
-            header.appendChild(title);
+            header.appendChild(this._buildPictoCard(action));
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
@@ -412,6 +599,108 @@ export default class extends Controller {
             row.appendChild(checksDiv);
             list.appendChild(row);
         });
+    }
+
+    // ─── Rendu carte picto action ───────────────────────────────────────────────
+
+    _buildPictoCard(action) {
+        const card = document.createElement('div');
+        card.className = 'action-picto-card';
+
+        // Section haute : nom tâche + picto tâche
+        const top = document.createElement('div');
+        top.className = 'action-picto-top';
+
+        if (action.tache) {
+            const nom = document.createElement('div');
+            nom.className = 'action-picto-tache-nom';
+            nom.textContent = action.tache.nom;
+            top.appendChild(nom);
+
+            const img = document.createElement('img');
+            img.src = this.pictoUrlValue + action.tache.code + '.png';
+            img.onerror = () => { img.style.display = 'none'; };
+            img.className = 'action-picto-tache-img';
+            top.appendChild(img);
+        } else {
+            const nom = document.createElement('div');
+            nom.className = 'action-picto-tache-nom';
+            nom.textContent = action.label;
+            top.appendChild(nom);
+        }
+        card.appendChild(top);
+
+        // Section basse : grille nécessaires + carte MEO
+        const bottom = document.createElement('div');
+        bottom.className = 'action-picto-bottom';
+
+        const grid = document.createElement('div');
+        grid.className = 'action-picto-grid';
+        (action.necessaires || []).forEach(nec => {
+            const filename = nec.type_nom === 'consommable' ? '_' + nec.code : nec.code;
+            const img = document.createElement('img');
+            img.src = this.pictoUrlValue + filename + '.png';
+            img.onerror = () => { img.style.display = 'none'; };
+            img.className = 'action-picto-nec-img';
+            grid.appendChild(img);
+        });
+        bottom.appendChild(grid);
+
+        if (action.meo && action.meo.produit_code && action.meo.produit_code !== 'P.00') {
+            bottom.appendChild(this._buildMeoCard(action.meo));
+        }
+
+        card.appendChild(bottom);
+        return card;
+    }
+
+    _buildMeoCard(meo) {
+        const colorMap = {
+            'vert': '#22c55e', 'rouge': '#ef4444', 'bleu': '#3b82f6',
+            'jaune': '#f4d40b', 'orange': '#fb923c', 'violet': '#a855f7',
+            'rose': '#ec4899', 'noir': '#111827', 'blanc': '#ffffff',
+            'gris': '#9ca3af', 'marron': '#92400e',
+        };
+        let bg = '#ffffff';
+        if (meo.produit_couleur) {
+            const c = meo.produit_couleur.toLowerCase().trim();
+            bg = c.startsWith('#') ? c : (colorMap[c] || '#ffffff');
+        }
+
+        const div = document.createElement('div');
+        div.style.cssText = 'margin-left:6px;width:70px;border:1px solid #4b5563;border-radius:4px;overflow:hidden;background:#fff;flex-shrink:0;';
+
+        const contenantImg = meo.contenant_id
+            ? `<img src="${this.contenantUrlValue}${meo.contenant_id}.png" onerror="this.style.display='none'" style="max-width:20px;max-height:20px;">`
+            : '';
+        const moyenImg = meo.moyen_dosage_id
+            ? `<img src="${this.moyenDosageUrlValue}${meo.moyen_dosage_id}.png" onerror="this.style.display='none'" style="max-width:24px;max-height:24px;">`
+            : '';
+        const tcImg = meo.temps_contact_id
+            ? `<img src="${this.tempsContactUrlValue}${meo.temps_contact_id}.png" onerror="this.style.display='none'" style="max-width:19px;max-height:19px;">`
+            : '';
+
+        div.innerHTML = `
+            <div style="display:flex;">
+                <div style="width:50%;padding:4px;border-right:1px solid #4b5563;background:${bg};display:flex;flex-direction:column;justify-content:space-between;align-items:center;">
+                    ${contenantImg}
+                    <span style="font-size:8px;font-weight:700;text-align:center;color:#111;">${meo.produit_code || ''}${meo.moyen_dosage_code ? '.' + meo.moyen_dosage_code : ''}</span>
+                </div>
+                <div style="width:50%;padding:4px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                    <span style="font-size:7px;color:#6b7280;">Eau</span>
+                    <span style="font-size:8px;font-weight:700;">${meo.volume_eau || ''}</span>
+                </div>
+            </div>
+            <div style="display:flex;border-top:1px solid #4b5563;">
+                <div style="width:50%;padding:4px;border-right:1px solid #4b5563;display:flex;align-items:center;justify-content:center;">${moyenImg}</div>
+                <div style="width:50%;display:flex;flex-direction:column;">
+                    <div style="flex:1;padding:4px;display:flex;align-items:center;justify-content:center;">
+                        <span style="font-size:8px;font-weight:700;">${meo.volume_produit != null ? meo.volume_produit : ''}</span>
+                    </div>
+                    <div style="flex:1;padding:4px;display:flex;align-items:center;justify-content:center;">${tcImg}</div>
+                </div>
+            </div>`;
+        return div;
     }
 
     // ─── Sérialisation ─────────────────────────────────────────────────────────
