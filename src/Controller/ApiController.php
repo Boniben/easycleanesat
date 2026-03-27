@@ -7,6 +7,7 @@ use App\Repository\SitesClientRepository;
 use App\Repository\ContratRepository;
 use App\Repository\ZonesClientRepository;
 use App\Repository\TypeSupportRepository;
+use App\Repository\SupportClientRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -89,6 +90,28 @@ class ApiController extends AbstractController
         $data = array_map(function ($zone) {
             return ['id' => $zone->getId(), 'nom' => $zone->getNom()];
         }, $zones);
+
+        return $this->json($data);
+    }
+
+    #[Route('/supports-by-zone/{zoneId}', name: 'api_supports_by_zone', methods: ['GET'])]
+    public function getSupportsByZone(int $zoneId, SupportClientRepository $supportClientRepository): JsonResponse
+    {
+        $supports = $supportClientRepository->createQueryBuilder('s')
+            ->join('s.typeSupport', 'ts')
+            ->where('s.zonesClient = :zoneId')
+            ->setParameter('zoneId', $zoneId)
+            ->orderBy('ts.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $data = array_map(function ($support) {
+            return [
+                'id' => $support->getId(),
+                'nom' => $support->getTypeSupport()->getNom(),
+                'type_support_id' => $support->getTypeSupport()->getId(),
+            ];
+        }, $supports);
 
         return $this->json($data);
     }

@@ -37,8 +37,8 @@
                 <td>{{ intervention.zonesClient ? intervention.zonesClient.nom : '' }}</td>
                 <td>{{ intervention.contrat ? intervention.contrat.numero : '' }}</td>
                 <td>
-                    {% if intervention.actions is not empty %}
-                        {{ intervention.actions|length }} action(s)
+                    {% if intervention.suppInters is not empty %}
+                        {{ intervention.suppInters|length }} support(s)
                     {% else %}
                         -
                     {% endif %}

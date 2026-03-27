@@ -2,10 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Actions;
 use App\Entity\Intervention;
 use App\Entity\JourDeLaSemaine;
 use App\Entity\Plage;
+use App\Entity\SupportClient;
+use App\Entity\SuppInter;
 use App\Form\InterventionType;
+use App\Repository\ActionsRepository;
 use App\Repository\InterventionRepository;
 use App\Repository\JourDeLaSemaineRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,34 +31,33 @@ final class InterventionController extends AbstractController
 
     /**
      * Crée une nouvelle intervention.
-     * 
+     *
      * Supporte 4 modes d'entrée via paramètres URL :
      * 1. ?client_id=X          → Pré-remplit uniquement le client
      * 2. ?sites_client_id=X    → Pré-remplit client + site
      * 3. ?contrat_id=X         → Pré-remplit client + site + contrat
      * 4. ?zones_client_id=X    → Pré-remplit client + site + contrat + zone
-     * 
+     *
      * Sans paramètres : formulaire vierge avec listes déroulantes dynamiques (AJAX/Stimulus)
      */
     #[Route('/new', name: 'app_intervention_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository, ActionsRepository $actionsRepository): Response
     {
         $intervention = new Intervention();
-        
+
         // Récupération des paramètres d'URL pour la pré-sélection
         $clientId = $request->query->get('client_id');
         $sitesClientId = $request->query->get('sites_client_id');
         $contratId = $request->query->get('contrat_id');
         $zonesClientId = $request->query->get('zones_client_id');
-        
+
         // Création du formulaire avec les paramètres
-        // Ces options sont passées à InterventionType::buildForm()
         $form = $this->createForm(InterventionType::class, $intervention, [
             'client_id' => $clientId,
             'sites_client_id' => $sitesClientId,
             'contrat_id' => $contratId,
             'zones_client_id' => $zonesClientId,
-            'em' => $entityManager,  // Nécessaire pour charger les entités dans le FormType
+            'em' => $entityManager,
         ]);
         $form->handleRequest($request);
 
@@ -82,6 +85,9 @@ final class InterventionController extends AbstractController
 
             $entityManager->flush();
 
+            // Traitement des supports et actions
+            $this->persistSuppInterData($request, $intervention, $entityManager);
+
             return $this->redirectToRoute('app_intervention_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -92,6 +98,9 @@ final class InterventionController extends AbstractController
             'form'         => $form,
             'jours'        => $jours,
             'plagesMap'    => [],
+            'actionsJson'  => $this->buildActionsJson($actionsRepository),
+            'suppInterJson' => 'null',
+            'initialZoneId' => $zonesClientId,
         ]);
     }
 
@@ -104,7 +113,7 @@ final class InterventionController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_intervention_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Intervention $intervention, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository): Response
+    public function edit(Request $request, Intervention $intervention, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository, ActionsRepository $actionsRepository): Response
     {
         $zonesClient = $intervention->getZonesClient();
         $contrat     = $intervention->getContrat();
@@ -123,6 +132,11 @@ final class InterventionController extends AbstractController
             // Supprimer les anciennes plages
             foreach ($intervention->getPlages() as $oldPlage) {
                 $entityManager->remove($oldPlage);
+            }
+
+            // Supprimer les anciens SuppInter
+            foreach ($intervention->getSuppInters() as $oldSuppInter) {
+                $entityManager->remove($oldSuppInter);
             }
 
             // Recréer les plages depuis le formulaire
@@ -146,6 +160,9 @@ final class InterventionController extends AbstractController
 
             $entityManager->flush();
 
+            // Recréer les supports et actions
+            $this->persistSuppInterData($request, $intervention, $entityManager);
+
             return $this->redirectToRoute('app_intervention_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -160,10 +177,13 @@ final class InterventionController extends AbstractController
         }
 
         return $this->render('intervention/edit.html.twig', [
-            'intervention' => $intervention,
-            'form'         => $form,
-            'jours'        => $jours,
-            'plagesMap'    => $plagesMap,
+            'intervention'  => $intervention,
+            'form'          => $form,
+            'jours'         => $jours,
+            'plagesMap'     => $plagesMap,
+            'actionsJson'   => $this->buildActionsJson($actionsRepository),
+            'suppInterJson' => $this->buildSuppInterJson($intervention),
+            'initialZoneId' => $zonesClient ? $zonesClient->getId() : null,
         ]);
     }
 
@@ -176,5 +196,96 @@ final class InterventionController extends AbstractController
         }
 
         return $this->redirectToRoute('app_intervention_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function buildActionsJson(ActionsRepository $actionsRepository): string
+    {
+        $actions = $actionsRepository->findAllActif();
+        $data = array_map(function (Actions $action) {
+            $label = 'Action #' . $action->getId();
+            foreach ($action->getNecessaire() as $nec) {
+                if ($nec->getTypeNecessaire() && $nec->getTypeNecessaire()->getId() === 4) {
+                    $label = $nec->getNom();
+                    break;
+                }
+            }
+            return ['id' => $action->getId(), 'label' => $label];
+        }, $actions);
+
+        return json_encode($data, JSON_UNESCAPED_UNICODE);
+    }
+
+    private function buildSuppInterJson(Intervention $intervention): string
+    {
+        $supports = [];
+        $actionsMap = [];
+
+        foreach ($intervention->getSuppInters() as $suppInter) {
+            $pos = $suppInter->getOrdre();
+            $supports[] = [
+                'support_client_id' => $suppInter->getSupportClient()->getId(),
+                'order_position'    => $pos,
+                'nom'               => $suppInter->getSupportClient()->getTypeSupport()->getNom(),
+            ];
+
+            foreach ($suppInter->getActions() as $action) {
+                $aId = $action->getId();
+                if (!isset($actionsMap[$aId])) {
+                    $label = 'Action #' . $aId;
+                    foreach ($action->getNecessaire() as $nec) {
+                        if ($nec->getTypeNecessaire() && $nec->getTypeNecessaire()->getId() === 4) {
+                            $label = $nec->getNom();
+                            break;
+                        }
+                    }
+                    $actionsMap[$aId] = ['actionsId' => $aId, 'label' => $label, 'suppInterPositions' => []];
+                }
+                $actionsMap[$aId]['suppInterPositions'][] = $pos;
+            }
+        }
+
+        // Sort supports by position
+        usort($supports, fn($a, $b) => $a['order_position'] <=> $b['order_position']);
+
+        return json_encode([
+            'supports' => $supports,
+            'actions'  => array_values($actionsMap),
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    private function persistSuppInterData(Request $request, Intervention $intervention, EntityManagerInterface $em): void
+    {
+        $raw = $request->request->get('supp_inter_data', '');
+        if (empty($raw)) {
+            return;
+        }
+
+        $data = json_decode($raw, true);
+        if (!is_array($data) || empty($data['supports'])) {
+            return;
+        }
+
+        // Map position → SuppInter entity
+        $suppInterMap = [];
+        foreach ($data['supports'] as $suppData) {
+            $suppInter = new SuppInter();
+            $suppInter->setIntervention($intervention);
+            $suppInter->setSupportClient($em->getReference(SupportClient::class, (int)$suppData['support_client_id']));
+            $suppInter->setOrdre((int)$suppData['order_position']);
+            $em->persist($suppInter);
+            $suppInterMap[(int)$suppData['order_position']] = $suppInter;
+        }
+        $em->flush();
+
+        // Lier les actions aux SuppInter
+        foreach ($data['actions'] ?? [] as $actionData) {
+            $action = $em->getReference(Actions::class, (int)$actionData['actions_id']);
+            foreach ($actionData['supp_inter_positions'] as $position) {
+                if (isset($suppInterMap[(int)$position])) {
+                    $suppInterMap[(int)$position]->addAction($action);
+                }
+            }
+        }
+        $em->flush();
     }
 }

@@ -1,7 +1,11 @@
-<div data-controller="intervention-form"
+<div data-controller="intervention-form supp-inter"
      data-intervention-form-sites-url-value="{{ path('api_sites_by_client', {'clientId': '__CLIENT_ID__'}) }}"
      data-intervention-form-contrats-url-value="{{ path('api_contrats_by_site', {'siteId': '__SITE_ID__'}) }}"
-     data-intervention-form-zones-url-value="{{ path('api_zones_by_site', {'siteId': '__SITE_ID__'}) }}">
+     data-intervention-form-zones-url-value="{{ path('api_zones_by_site', {'siteId': '__SITE_ID__'}) }}"
+     data-supp-inter-supports-url-value="{{ path('api_supports_by_zone', {'zoneId': '__ZONE_ID__'}) }}"
+     data-supp-inter-actions-value="{{ actionsJson|e('html_attr') }}"
+     data-supp-inter-initial-data-value="{{ suppInterJson|e('html_attr') }}"
+     data-supp-inter-initial-zone-id-value="{{ initialZoneId ?? '' }}">
 {{ form_start(form) }}
     <div{% if is_edit is defined and is_edit %} style="display:none"{% endif %}>
         {{ form_label(form.client) }}
@@ -13,7 +17,7 @@
         }) }}
         {{ form_errors(form.client) }}
     </div>
-    
+
     <div{% if is_edit is defined and is_edit %} style="display:none"{% endif %}>
         {{ form_label(form.site) }}
         {{ form_widget(form.site, {
@@ -24,7 +28,7 @@
         }) }}
         {{ form_errors(form.site) }}
     </div>
-    
+
     <div{% if is_edit is defined and is_edit %} style="display:none"{% endif %}>
         {{ form_label(form.contrat) }}
         {{ form_widget(form.contrat, {
@@ -34,16 +38,40 @@
         }) }}
         {{ form_errors(form.contrat) }}
     </div>
-    
+
     <div{% if is_edit is defined and is_edit %} style="display:none"{% endif %}>
         {{ form_label(form.zonesClient) }}
         {{ form_widget(form.zonesClient, {
             'attr': {
-                'data-intervention-form-target': 'zone'
+                'data-intervention-form-target': 'zone',
+                'data-supp-inter-target': 'zone',
+                'data-action': 'change->supp-inter#onZoneChange'
             }
         }) }}
         {{ form_errors(form.zonesClient) }}
     </div>
+
+    {# Section supports de la zone #}
+    <div data-supp-inter-target="supportsSection" class="form-group supp-section" style="display:none">
+        <label class="supp-section-label">Supports de la zone</label>
+        <div data-supp-inter-target="supportsGrid" class="tile-grid supp-grid"></div>
+    </div>
+
+    {# Section actions #}
+    <div data-supp-inter-target="actionsSection" class="form-group supp-section" style="display:none">
+        <label class="supp-section-label">Actions</label>
+        <div class="action-search-wrapper">
+            <input type="text"
+                   data-supp-inter-target="actionSearch"
+                   data-action="input->supp-inter#onActionSearchInput blur->supp-inter#onActionSearchBlur"
+                   placeholder="Rechercher une action..."
+                   class="action-search-input"
+                   autocomplete="off">
+            <div data-supp-inter-target="actionDropdown" class="action-dropdown" style="display:none"></div>
+        </div>
+        <div data-supp-inter-target="actionsList" class="actions-list"></div>
+    </div>
+
     {{ form_row(form.redacteur) }}
     <div class="form-group">
         {{ form_label(form.dateCreation) }}
@@ -51,7 +79,7 @@
         {{ form_errors(form.dateCreation) }}
     </div>
     {{ form_row(form.nbTravailleur) }}
-    
+
     <div class="form-group">
         <label>Durée recommandé de l'intervention</label>
         <div class="duree-container">
@@ -132,6 +160,8 @@
             {% endfor %}
         </div>
     </div>
+
+    <input type="hidden" name="supp_inter_data" data-supp-inter-target="hiddenData">
 
     <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
@@ -218,6 +248,139 @@
     background: #3d5a80 !important;
     color: #fff !important;
     box-shadow: 0 2px 8px rgba(61,90,128,0.35);
+}
+
+/* Supp-inter section styles */
+.supp-section { margin-bottom: 1.2rem; }
+.supp-section-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    color: #1e2028;
+}
+.supp-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+}
+.supp-card {
+    position: relative;
+    min-height: 60px;
+    justify-content: center;
+}
+.supp-card.selected[draggable="true"] {
+    cursor: grab;
+}
+.supp-card.selected[draggable="true"]:active {
+    cursor: grabbing;
+}
+.supp-card.drag-over {
+    border-style: dashed !important;
+    opacity: 0.7;
+}
+.supp-position-badge {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-top: 2px;
+}
+
+/* Actions section styles */
+.action-search-wrapper {
+    position: relative;
+    max-width: 380px;
+    margin-bottom: 0.8rem;
+}
+.action-search-input {
+    width: 100%;
+    padding: 7px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.92rem;
+    box-sizing: border-box;
+}
+.action-search-input:focus {
+    outline: none;
+    border-color: #3d5a80;
+}
+.action-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 100;
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.action-dropdown-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.88rem;
+}
+.action-dropdown-item:hover {
+    background: #dce4ed;
+    color: #3d5a80;
+}
+.action-dropdown-empty {
+    padding: 8px 12px;
+    color: #888;
+    font-size: 0.85rem;
+}
+.actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.action-row {
+    border: 1px solid #d0d4db;
+    border-radius: 6px;
+    background: #f8f9fa;
+    overflow: hidden;
+}
+.action-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px;
+    background: #eef1f5;
+    border-bottom: 1px solid #d0d4db;
+    font-size: 0.88rem;
+}
+.action-remove-btn {
+    border: none;
+    background: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 4px;
+    line-height: 1;
+}
+.action-remove-btn:hover { color: #c0392b; }
+.action-support-checks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 7px 12px;
+    font-size: 0.85rem;
+}
+.action-associate-label {
+    color: #555;
+    font-weight: 600;
+    margin-right: 0.2rem;
+}
+.action-support-check {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    white-space: nowrap;
 }
 </style>
 
