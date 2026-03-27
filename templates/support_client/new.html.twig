@@ -9,9 +9,9 @@
 		{% if zone %}
 			<p class="text-muted text-sm">Zone :
 				{{ zone.nom }}
-				—
+				-
 				{{ zone.sitesClient.nom }}
-				—
+				-
 				{{ zone.sitesClient.client.nom }}</p>
 		{% endif %}
 	</div>
@@ -19,22 +19,21 @@
 	<form method="POST" id="support-form">
 		<input type="hidden" name="zone_id" value="{{ zone ? zone.id : '' }}">
 
-		<div
-			class="form-card">
-			{# Barre de recherche #}
+		<div class="form-card">
 			<div class="form-row">
 				<label>Rechercher un type de support</label>
-				<input type="text" id="search-type-support" placeholder="Rechercher (ex: sanitaire, sol, bureau...)" style="width:100%; padding:10px; border:1px solid var(--color-border); border-radius:8px; font-size:0.95rem;">
+				<div style="display:flex; gap:8px;">
+					<input type="text" id="search-type-support" placeholder="Rechercher (ex: sanitaire, sol, bureau...)" style="flex:1; padding:10px; border:1px solid var(--color-border); border-radius:8px; font-size:0.95rem;">
+					<button type="button" id="btn-search-support" class="btn btn-primary">Rechercher</button>
+				</div>
 			</div>
 
-			{# Supports sélectionnés #}
 			<div class="form-row">
-				<label>Supports sélectionnés</label>
+				<label>Supports selectionnes</label>
 				<div id="selected-supports" style="display:flex; flex-wrap:wrap; gap:8px; min-height:40px; padding:8px; border:1px dashed var(--color-border); border-radius:8px;"></div>
 			</div>
 		</div>
 
-		{# Résultats pleine largeur #}
 		<div id="results-type-support" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:8px; margin:16px 0;"></div>
 
 		<div style="margin-top:16px;">
@@ -49,22 +48,19 @@ const resultsContainer = document.getElementById('results-type-support');
 const selectedContainer = document.getElementById('selected-supports');
 const btnSave = document.getElementById('btn-save');
 const form = document.getElementById('support-form');
-let selectedSupports = {}; // { id: {id, nom, description} }
-let searchTimeout;
+let selectedSupports = {};
 
-searchInput.addEventListener('input', function () {
-clearTimeout(searchTimeout);
-const query = this.value.trim();
+function doSearch() {
+const query = searchInput.value.trim();
 if (query.length < 2) {
 resultsContainer.innerHTML = '';
 return;
 }
 
-searchTimeout = setTimeout(() => {
 fetch('{{ path("api_type_support_search") }}?q=' + encodeURIComponent(query)).then(r => r.json()).then(data => {
 resultsContainer.innerHTML = '';
 if (data.length === 0) {
-resultsContainer.innerHTML = '<p style="color:var(--color-text-secondary); grid-column:1/-1;">Aucun support trouvé</p>';
+resultsContainer.innerHTML = '<p style="color:var(--color-text-secondary); grid-column:1/-1;">Aucun support trouve</p>';
 return;
 }
 data.forEach(item => {
@@ -94,44 +90,44 @@ card.style.borderColor = 'var(--color-primary)';
 card.style.background = '#dbe8f4';
 } renderSelected();
 });
-
 card.addEventListener('mouseenter', () => {
 if (! selectedSupports[item.id]) 
 card.style.borderColor = 'var(--color-primary)';
-
 
 });
 card.addEventListener('mouseleave', () => {
 if (! selectedSupports[item.id]) 
 card.style.borderColor = 'var(--color-border)';
 
-
 });
 card.setAttribute('data-ts', item.id);
 resultsContainer.appendChild(card);
 });
 });
-}, 300);
+}
+
+document.getElementById('btn-search-support').addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', function (e) {
+if (e.key === 'Enter') {
+e.preventDefault();
+doSearch();
+}
 });
 
 function renderSelected() {
 selectedContainer.innerHTML = '';
-// Supprimer les anciens hidden inputs
 form.querySelectorAll('input[name="type_support_ids[]"]').forEach(el => el.remove());
-
 const ids = Object.keys(selectedSupports);
 btnSave.disabled = ids.length === 0;
 
 ids.forEach(id => {
 const s = selectedSupports[id];
-// Badge visuel
 const badge = document.createElement('div');
 badge.style.cssText = 'display:inline-flex; align-items:center; gap:6px; padding:5px 10px; background:#dbe8f4; border:2px solid var(--color-primary); border-radius:6px;';
-badge.innerHTML = '<strong style="color:var(--color-primary); font-size:0.8rem;">' + s.nom + '</strong>' + '<button type="button" style="background:none; border:none; color:var(--color-text-secondary); cursor:pointer; font-size:0.9rem;" data-id="' + id + '">✕</button>';
+badge.innerHTML = '<strong style="color:var(--color-primary); font-size:0.8rem;">' + s.nom + '</strong>' + '<button type="button" style="background:none; border:none; color:var(--color-text-secondary); cursor:pointer; font-size:0.9rem;" data-id="' + id + '">x</button>';
 badge.querySelector('button').addEventListener('click', () => {
 delete selectedSupports[id];
 renderSelected();
-// Mettre à jour la surbrillance dans les résultats
 const card = resultsContainer.querySelector('[data-ts="' + id + '"]');
 if (card) {
 card.style.borderColor = 'var(--color-border)';
@@ -140,7 +136,6 @@ card.style.background = 'var(--color-surface)';
 });
 selectedContainer.appendChild(badge);
 
-// Hidden input pour le formulaire
 const hidden = document.createElement('input');
 hidden.type = 'hidden';
 hidden.name = 'type_support_ids[]';
