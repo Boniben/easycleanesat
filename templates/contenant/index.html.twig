@@ -12,9 +12,9 @@
         <thead>
             <tr>
                 <th>Id</th>
+                <th>Picto</th>
                 <th>Nom</th>
                 <th>Volume eau</th>
-                <th>Picto</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -22,11 +22,11 @@
         {% for contenant in contenants %}
             <tr>
                 <td>{{ contenant.id }}</td>
-                <td>{{ contenant.nom }}</td>
-                <td>{{ contenant.volumeEau }}</td>
                 <td>
                     <img src="{{ asset('PictoContenantPNG/' ~ contenant.id ~ '.png') }}" alt="Pictogramme {{ contenant.nom }}" style="max-height: 40px;">
                 </td>
+                <td>{{ contenant.nom }}</td>
+                <td>{{ contenant.volumeEau }}</td>
                 <td>
                     <div style="display: flex; gap: 8px;">
                         <a href="{{ path('app_contenant_show', {'id': contenant.id}) }}" class="btn btn-sm btn-outline-secondary" title="Afficher" aria-label="Afficher">

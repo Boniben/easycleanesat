@@ -28,7 +28,18 @@
                 <td>{{ produit.id }}</td>
                 <td>{{ produit.code }}</td>
                 <td>{{ produit.nom }}</td>
-                <td>{{ produit.couleur }}</td>
+                <td>
+                    {% set colorMap = {
+                        'vert': '#22c55e',
+                        'rouge': '#ef4444',
+                        'bleu': '#3b82f6',
+                        'jaune': '#ffff01',
+                        'orange': '#fb923c'
+                    } %}
+                    {% set couleurKey = produit.couleur|lower %}
+                    {% set bgColor = couleurKey starts with '#' ? couleurKey : (colorMap[couleurKey] ?? couleurKey) %}
+                    <span style="display: inline-block; width: 24px; height: 24px; border-radius: 4px; background-color: {{ bgColor }}; border: 1px solid #ccc;" title="{{ produit.couleur }}"></span>
+                </td>
 
                 <td>
 
