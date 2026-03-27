@@ -134,10 +134,9 @@
                 </td>
 
                 {% for necessaire in action.necessaire %}
-                <td>{{necessaire.code}} </td>
+                <td><a href="{{path('app_necessaire_show', {'id': necessaire.id})}}">{{necessaire.code}}</a> </td>
                 {% endfor %}
 
-                <!--<td>{{dump(action)}}</td>-->
                 <td>{{action.meoProduit.produit.code}}</td>
                 <td>{{action.meoProduit.contenant ? action.meoProduit.contenant.id : '0'}}</td>
                 <td>{{action.meoProduit.moyenDosage ? action.meoProduit.moyenDosage.code : '0'}}</td>
