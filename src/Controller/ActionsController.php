@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 
 #[Route('/actions')]
 final class ActionsController extends AbstractController
@@ -33,6 +35,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/new', name: 'app_actions_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You are not allowed to access the admin dashboard.')]
     public function new(Request $request, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository, MeoProduitRepository $meoProduitRepository): Response
     {
         $action = new Actions();
@@ -95,6 +98,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_actions_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You are not allowed to access the admin dashboard.')]
     public function edit(Request $request, Actions $action, EntityManagerInterface $entityManager, TypeNecessaireRepository $typeNecessaireRepository, MeoProduitRepository $meoProduitRepository): Response
     {
         $form = $this->createForm(ActionsType::class, $action);
@@ -147,6 +151,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_actions_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You are not allowed to access the admin dashboard.')]
     public function delete(Request $request, Actions $action, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$action->getId(), $request->getPayload()->getString('_token'))) {
@@ -158,6 +163,7 @@ final class ActionsController extends AbstractController
     }
 
     #[Route('/{id}/toggle-actif', name: 'app_actions_toggle_actif', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'You are not allowed to access the admin dashboard.')]
     public function toggleActif(Request $request, Actions $action, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('toggle_actif'.$action->getId(), $request->getPayload()->getString('_token'))) {

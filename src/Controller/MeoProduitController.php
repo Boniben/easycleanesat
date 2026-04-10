@@ -109,6 +109,31 @@ final class MeoProduitController extends AbstractController
     {
         if ($this->isCsrfTokenValid('toggle_actif'.$meoProduit->getId(), $request->getPayload()->getString('_token'))) {
             $meoProduit->setActif(!$meoProduit->isActif());
+            
+            if (!$meoProduit->isActif()) {
+                $actionsLiees = $meoProduit->getActions();
+                $nbActionsDesactivees = 0;
+                
+                foreach ($actionsLiees as $action) {
+                    if ($action->isActif()) {
+                        $action->setActif(false);
+                        $entityManager->persist($action);
+                        $nbActionsDesactivees++;
+                    }
+                }
+                
+                if ($nbActionsDesactivees > 0) {
+                    $this->addFlash('warning', sprintf(
+                        'Le produit a été désactivé. %d action(s) liée(s) ont également été désactivée(s).',
+                        $nbActionsDesactivees
+                    ));
+                } else {
+                    $this->addFlash('success', 'Le produit a été désactivé (aucune action liée).');
+                }
+            } else {
+                $this->addFlash('success', 'Le produit a été réactivé.');
+            }
+            
             $entityManager->flush();
         }
 

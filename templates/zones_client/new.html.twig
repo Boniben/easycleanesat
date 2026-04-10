@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer une zone
+{% block title %}Creer une zone
 {% endblock %}
 
 {% block body %}
 	<div class="page-header">
-		<h1>Créer une zone</h1>
+		<h1>Creer une zone</h1>
 	</div>
 
 	{{ form_start(form, {'attr': {'id': 'zone-form'}}) }}
@@ -21,22 +21,21 @@
 			{{ form_widget(form.sitesClient) }}
 		</div>
 
-		{# Champ caché TypeZone #}
 		<div style="display:none">
 			{{ form_widget(form.typeZone) }}
 		</div>
 
-		{# Barre de recherche #}
 		<div class="form-row">
 			<label>Type de zone</label>
-			<input type="text" id="search-type-zone" placeholder="Rechercher un type de zone (ex: sanitaire, bureau, cuisine...)" style="width:100%; padding:10px; border:1px solid var(--color-border); border-radius:8px; font-size:0.95rem;">
+			<div style="display:flex; gap:8px;">
+				<input type="text" id="search-type-zone" placeholder="Rechercher un type de zone (ex: sanitaire, bureau, cuisine...)" style="flex:1; padding:10px; border:1px solid var(--color-border); border-radius:8px; font-size:0.95rem;">
+				<button type="button" id="btn-search-zone" class="btn btn-primary">Rechercher</button>
+			</div>
 		</div>
 
-		{# Zone sélectionnée #}
 		<div id="selected-type-zone" style="margin-bottom:12px;"></div>
 	</div>
 
-	{# Résultats pleine largeur #}
 	<div id="results-type-zone" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap:8px; margin:16px 0;"></div>
 
 	<div style="margin-top:16px;">
@@ -46,7 +45,7 @@
 
 	{{ form_end(form) }}
 
-	<a href="{{ path('app_client_index') }}" class="btn btn-secondary" style="margin-top:12px;">← Retour à la liste</a>
+	<a href="{{ path('app_client_index') }}" class="btn btn-secondary" style="margin-top:12px;">Retour a la liste</a>
 
 	<script>
 		const searchInput = document.getElementById('search-type-zone');
@@ -54,30 +53,25 @@ const resultsContainer = document.getElementById('results-type-zone');
 const selectedContainer = document.getElementById('selected-type-zone');
 const typeZoneSelect = document.getElementById('{{ form.typeZone.vars.id }}');
 let selectedId = typeZoneSelect.value || null;
-let searchTimeout;
 
 if (selectedId) {
 const opt = typeZoneSelect.querySelector('option[value="' + selectedId + '"]');
 if (opt) 
 showSelected(selectedId, opt.textContent, '');
 
-
-
 }
 
-searchInput.addEventListener('input', function () {
-clearTimeout(searchTimeout);
-const query = this.value.trim();
+function doSearch() {
+const query = searchInput.value.trim();
 if (query.length < 2) {
 resultsContainer.innerHTML = '';
 return;
 }
 
-searchTimeout = setTimeout(() => {
 fetch('{{ path("api_type_zone_search") }}?q=' + encodeURIComponent(query)).then(r => r.json()).then(data => {
 resultsContainer.innerHTML = '';
 if (data.length === 0) {
-resultsContainer.innerHTML = '<p style="color:var(--color-text-secondary); grid-column:1/-1;">Aucun type trouvé</p>';
+resultsContainer.innerHTML = '<p style="color:var(--color-text-secondary); grid-column:1/-1;">Aucun type trouve</p>';
 return;
 }
 data.forEach(item => {
@@ -105,21 +99,24 @@ card.addEventListener('mouseenter', () => {
 if (selectedId != item.id) 
 card.style.borderColor = 'var(--color-primary)';
 
-
-
 });
 card.addEventListener('mouseleave', () => {
 if (selectedId != item.id) 
 card.style.borderColor = 'var(--color-border)';
-
-
 
 });
 card.setAttribute('data-tz', item.id);
 resultsContainer.appendChild(card);
 });
 });
-}, 300);
+}
+
+document.getElementById('btn-search-zone').addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', function (e) {
+if (e.key === 'Enter') {
+e.preventDefault();
+doSearch();
+}
 });
 
 function selectTypeZone(id, nom, desc) {
@@ -129,7 +126,7 @@ showSelected(id, nom, desc);
 }
 
 function showSelected(id, nom, desc) {
-selectedContainer.innerHTML = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:#dbe8f4; border:2px solid var(--color-primary); border-radius:6px;">' + '<strong style="color:var(--color-primary); font-size:0.85rem;">' + nom + '</strong>' + '<button type="button" onclick="clearSelection()" style="background:none; border:none; color:var(--color-text-secondary); cursor:pointer; font-size:1rem;">✕</button>' + '</div>';
+selectedContainer.innerHTML = '<div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; background:#dbe8f4; border:2px solid var(--color-primary); border-radius:6px;">' + '<strong style="color:var(--color-primary); font-size:0.85rem;">' + nom + '</strong>' + '<button type="button" onclick="clearSelection()" style="background:none; border:none; color:var(--color-text-secondary); cursor:pointer; font-size:1rem;">x</button>' + '</div>';
 }
 
 function clearSelection() {

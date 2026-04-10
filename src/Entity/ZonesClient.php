@@ -27,7 +27,7 @@ class ZonesClient
     /**
      * @var Collection<int, SupportClient>
      */
-    #[ORM\OneToMany(targetEntity: SupportClient::class, mappedBy: 'zonesClient')]
+    #[ORM\OneToMany(targetEntity: SupportClient::class, mappedBy: 'zonesClient', cascade: ['remove'], orphanRemoval: true)]
     private Collection $supportsClient;
 
     /**

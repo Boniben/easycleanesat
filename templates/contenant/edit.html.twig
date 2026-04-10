@@ -5,7 +5,8 @@
 {% block body %}
     <h1>Modifier Contenant</h1>
 
-    <p><strong>Picto actuel :</strong> {{ contenant.id }}.png</p>
+    <p><strong>Picto actuel :</strong></p>
+    <img src="{{ asset('PictoContenantPNG/' ~ contenant.id ~ '.png') }}" alt="Picto actuel" style="max-height: 80px; margin-bottom: 15px;">
 
     {{ include('contenant/_form.html.twig', {
         'button_label': 'Mettre a jour',
