@@ -130,6 +130,15 @@ export default class extends Controller {
         const grid = this.supportsGridTarget;
         grid.innerHTML = '';
 
+        if (this.allSupports.length === 0) {
+            const msg = document.createElement('p');
+            msg.className = 'text-muted fst-italic';
+            msg.textContent = 'Aucun support n\'est associé à cette zone.';
+            grid.appendChild(msg);
+            this.serialize();
+            return;
+        }
+
         // Supports sélectionnés en premier (triés par position)
         const sortedSelected = [...this.selectedSupports].sort((a, b) => a.orderPosition - b.orderPosition);
         for (const sel of sortedSelected) {
