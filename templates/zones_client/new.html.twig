@@ -48,7 +48,8 @@
 	<a href="{{ path('app_client_index') }}" class="btn btn-secondary" style="margin-top:12px;">Retour a la liste</a>
 
 	<script>
-		const searchInput = document.getElementById('search-type-zone');
+		(function () {
+const searchInput = document.getElementById('search-type-zone');
 const resultsContainer = document.getElementById('results-type-zone');
 const selectedContainer = document.getElementById('selected-type-zone');
 const typeZoneSelect = document.getElementById('{{ form.typeZone.vars.id }}');
@@ -58,6 +59,7 @@ if (selectedId) {
 const opt = typeZoneSelect.querySelector('option[value="' + selectedId + '"]');
 if (opt) 
 showSelected(selectedId, opt.textContent, '');
+
 
 
 }
@@ -83,7 +85,7 @@ isSelected ? 'var(--color-primary)' : 'var(--color-border)'
 ) + '; border-radius:6px; cursor:pointer; text-align:center; transition:all 0.15s; background:' + (
 isSelected ? '#dbe8f4' : 'var(--color-surface)'
 ) + ';';
-card.innerHTML = (item.picto ? '<img src="  {{ asset("PictoTypeZonePNG/") }}' + item.picto + '" alt="' + item.nom + '" style="max-height:50px; margin-bottom:4px;">' : '') + '<div style="font-weight:600; color:var(--color-primary); font-size:0.85rem;">' + item.nom + '</div>' + (
+card.innerHTML = (item.picto ? '<img src="   {{ asset("PictoTypeZonePNG/") }}' + item.picto + '" alt="' + item.nom + '" style="max-height:50px; margin-bottom:4px;">' : '') + '<div style="font-weight:600; color:var(--color-primary); font-size:0.85rem;">' + item.nom + '</div>' + (
 item.description ? '<div style="color:var(--color-text-secondary); font-size:0.7rem; margin-top:2px;">' + item.description + '</div>' : ''
 );
 
@@ -101,10 +103,12 @@ if (selectedId != item.id)
 card.style.borderColor = 'var(--color-primary)';
 
 
+
 });
 card.addEventListener('mouseleave', () => {
 if (selectedId != item.id) 
 card.style.borderColor = 'var(--color-border)';
+
 
 
 });
@@ -141,5 +145,8 @@ c.style.borderColor = 'var(--color-border)';
 c.style.background = 'var(--color-surface)';
 });
 }
+}
+}
+)();
 	</script>
 {% endblock %}
