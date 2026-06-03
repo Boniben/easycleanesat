@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DateIntervenationIntervenant index{% endblock %}
+
+{% block body %}
+    <h1>DateIntervenationIntervenant index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Date_intervention</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for date_intervenation_intervenant in date_intervenation_intervenants %}
+            <tr>
+                <td>{{ date_intervenation_intervenant.id }}</td>
+                <td>{{ date_intervenation_intervenant.dateIntervention ? date_intervenation_intervenant.dateIntervention|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_date_intervenation_intervenant_show', {'id': date_intervenation_intervenant.id}) }}">show</a>
+                    <a href="{{ path('app_date_intervenation_intervenant_edit', {'id': date_intervenation_intervenant.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_date_intervenation_intervenant_new') }}">Create new</a>
+{% endblock %}

@@ -68,12 +68,26 @@ class Intervention
     #[ORM\ManyToMany(targetEntity: Actions::class, mappedBy: 'intervention')]
     private Collection $actions;
 
+    /**
+     * @var Collection<int, DateIntervenationIntervenant>
+     */
+    #[ORM\OneToMany(targetEntity: DateIntervenationIntervenant::class, mappedBy: 'intervention')]
+    private Collection $DateIntervenationIntervenant;
+
     public function __construct()
     {
         $this->elementSecurites = new ArrayCollection();
         $this->vigilanceInterventions = new ArrayCollection();
         $this->plages = new ArrayCollection();
+<<<<<<< Updated upstream
         $this->actions = new ArrayCollection();
+=======
+        $this->numVersion = 1;
+        $this->dureeHeure = 0;
+        $this->dureeMinute = 0;
+        $this->suppInters = new ArrayCollection();
+        $this->DateIntervenationIntervenant = new ArrayCollection();
+>>>>>>> Stashed changes
     }
 
     public function getId(): ?int
@@ -302,4 +316,38 @@ class Intervention
 
         return $this;
     }
+<<<<<<< Updated upstream
+=======
+
+    /**
+     * @return Collection<int, DateIntervenationIntervenant>
+     */
+    public function getIntervenant(): Collection
+    {
+        return $this->intervenant;
+    }
+
+    public function addIntervenant(DateIntervenationIntervenant $intervenant): static
+    {
+        if (!$this->intervenant->contains($intervenant)) {
+            $this->intervenant->add($intervenant);
+            $intervenant->setIntervention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIntervenant(DateIntervenationIntervenant $intervenant): static
+    {
+        if ($this->intervenant->removeElement($intervenant)) {
+            // set the owning side to null (unless already changed)
+            if ($intervenant->getIntervention() === $this) {
+                $intervenant->setIntervention(null);
+            }
+        }
+
+        return $this;
+    }
+
+>>>>>>> Stashed changes
 }

@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Handicap{% endblock %}
+
+{% block body %}
+    <h1>Handicap</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ handicap.id }}</td>
+            </tr>
+            <tr>
+                <th>Type_handicap</th>
+                <td>{{ handicap.typeHandicap }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_handicap_index') }}">back to list</a>
+
+    <a href="{{ path('app_handicap_edit', {'id': handicap.id}) }}">edit</a>
+
+    {{ include('handicap/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Handicap index{% endblock %}
+
+{% block body %}
+    <h1>Handicap index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Type_handicap</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for handicap in handicaps %}
+            <tr>
+                <td>{{ handicap.id }}</td>
+                <td>{{ handicap.typeHandicap }}</td>
+                <td>
+                    <a href="{{ path('app_handicap_show', {'id': handicap.id}) }}">show</a>
+                    <a href="{{ path('app_handicap_edit', {'id': handicap.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_handicap_new') }}">Create new</a>
+{% endblock %}
