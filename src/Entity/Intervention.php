@@ -79,15 +79,11 @@ class Intervention
         $this->elementSecurites = new ArrayCollection();
         $this->vigilanceInterventions = new ArrayCollection();
         $this->plages = new ArrayCollection();
-<<<<<<< Updated upstream
-        $this->actions = new ArrayCollection();
-=======
         $this->numVersion = 1;
         $this->dureeHeure = 0;
         $this->dureeMinute = 0;
         $this->suppInters = new ArrayCollection();
         $this->DateIntervenationIntervenant = new ArrayCollection();
->>>>>>> Stashed changes
     }
 
     public function getId(): ?int
@@ -316,8 +312,6 @@ class Intervention
 
         return $this;
     }
-<<<<<<< Updated upstream
-=======
 
     /**
      * @return Collection<int, DateIntervenationIntervenant>
@@ -349,5 +343,4 @@ class Intervention
         return $this;
     }
 
->>>>>>> Stashed changes
 }
