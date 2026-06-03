@@ -63,10 +63,10 @@ class Intervention
     private Collection $plages;
 
     /**
-     * @var Collection<int, Actions>
+     * @var Collection<int, SuppInter>
      */
-    #[ORM\ManyToMany(targetEntity: Actions::class, mappedBy: 'intervention')]
-    private Collection $actions;
+    #[ORM\OneToMany(targetEntity: SuppInter::class, mappedBy: 'intervention')]
+    private Collection $suppInters;
 
     /**
      * @var Collection<int, DateIntervenationIntervenant>
@@ -287,27 +287,30 @@ class Intervention
     }
 
     /**
-     * @return Collection<int, Actions>
+     * @return Collection<int, SuppInter>
      */
-    public function getActions(): Collection
+    public function getSuppInters(): Collection
     {
-        return $this->actions;
+        return $this->suppInters;
     }
 
-    public function addAction(Actions $action): static
+    public function addSuppInter(SuppInter $suppInter): static
     {
-        if (!$this->actions->contains($action)) {
-            $this->actions->add($action);
-            $action->addIntervention($this);
+        if (!$this->suppInters->contains($suppInter)) {
+            $this->suppInters->add($suppInter);
+            $suppInter->setIntervention($this);
         }
 
         return $this;
     }
 
-    public function removeAction(Actions $action): static
+    public function removeSuppInter(SuppInter $suppInter): static
     {
-        if ($this->actions->removeElement($action)) {
-            $action->removeIntervention($this);
+        if ($this->suppInters->removeElement($suppInter)) {
+            // set the owning side to null (unless already changed)
+            if ($suppInter->getIntervention() === $this) {
+                $suppInter->setIntervention(null);
+            }
         }
 
         return $this;
