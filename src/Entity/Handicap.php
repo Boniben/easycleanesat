@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\HandicapRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HandicapRepository::class)]
@@ -18,6 +20,17 @@ class Handicap
 
     #[ORM\ManyToOne(inversedBy: 'handicaps')]
     private ?Intervenant $intervenant = null;
+
+    /**
+     * @var Collection<int, Intervenant>
+     */
+    #[ORM\OneToMany(targetEntity: Intervenant::class, mappedBy: 'handicap')]
+    private Collection $intervenants;
+
+    public function __construct()
+    {
+        $this->intervenants = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -36,14 +49,33 @@ class Handicap
         return $this;
     }
 
-    public function getIntervenant(): ?Intervenant
+
+    /**
+     * @return Collection<int, Intervenant>
+     */
+    public function getIntervenants(): Collection
     {
-        return $this->intervenant;
+        return $this->intervenants;
     }
 
-    public function setIntervenant(?Intervenant $intervenant): static
+    public function addIntervenant(Intervenant $intervenant): static
     {
-        $this->intervenant = $intervenant;
+        if (!$this->intervenants->contains($intervenant)) {
+            $this->intervenants->add($intervenant);
+            $intervenant->setHandicap($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIntervenant(Intervenant $intervenant): static
+    {
+        if ($this->intervenants->removeElement($intervenant)) {
+            // set the owning side to null (unless already changed)
+            if ($intervenant->getHandicap() === $this) {
+                $intervenant->setHandicap(null);
+            }
+        }
 
         return $this;
     }

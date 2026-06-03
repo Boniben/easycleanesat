@@ -3,15 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Actions;
+use App\Entity\DateIntervenationIntervenant;
 use App\Entity\Intervention;
 use App\Entity\JourDeLaSemaine;
 use App\Entity\Plage;
+use App\Entity\Responsable;
 use App\Entity\SupportClient;
 use App\Entity\SuppInter;
 use App\Form\InterventionType;
 use App\Repository\ActionsRepository;
 use App\Repository\InterventionRepository;
 use App\Repository\JourDeLaSemaineRepository;
+use App\Repository\ResponsableRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +44,7 @@ final class InterventionController extends AbstractController
      * Sans paramètres : formulaire vierge avec listes déroulantes dynamiques (AJAX/Stimulus)
      */
     #[Route('/new', name: 'app_intervention_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository, ActionsRepository $actionsRepository): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository, ActionsRepository $actionsRepository, ResponsableRepository $responsableRepository): Response
     {
         $intervention = new Intervention();
 
@@ -83,6 +86,22 @@ final class InterventionController extends AbstractController
                 }
             }
 
+            // Pour chaque intervenant sélectionné dans le formulaire,
+            // on crée un enregistrement DateIntervenationIntervenant qui lie
+            // l'intervenant à cette fiche. Le formulaire envoie aussi
+            // responsable_for[intervenant_id] = responsable_id pour chaque
+            // intervenant — on l'associe directement sur la ligne de liaison.
+            $responsableForMap = $request->request->all('responsable_for');
+            foreach ($form->get('intervenants')->getData() as $intervenant) {
+                $dii = new DateIntervenationIntervenant();
+                $dii->setIntervention($intervention);
+                $dii->setIntervenant($intervenant);
+                $responsableId = $responsableForMap[$intervenant->getId()] ?? null;
+                if ($responsableId) {
+                    $dii->setResponsable($entityManager->find(Responsable::class, (int)$responsableId));
+                }
+                $entityManager->persist($dii);
+            }
             $entityManager->flush();
 
             // Traitement des supports et actions
@@ -94,13 +113,15 @@ final class InterventionController extends AbstractController
         $jours = $jourRepository->findBy([], ['id' => 'ASC']);
 
         return $this->render('intervention/new.html.twig', [
-            'intervention' => $intervention,
-            'form'         => $form,
-            'jours'        => $jours,
-            'plagesMap'    => [],
-            'actionsJson'  => $this->buildActionsJson($actionsRepository),
-            'suppInterJson' => 'null',
-            'initialZoneId' => $zonesClientId,
+            'intervention'          => $intervention,
+            'form'                  => $form,
+            'jours'                 => $jours,
+            'plagesMap'             => [],
+            'actionsJson'           => $this->buildActionsJson($actionsRepository),
+            'suppInterJson'         => 'null',
+            'initialZoneId'         => $zonesClientId,
+            'responsablesData'      => $this->buildResponsablesData($responsableRepository),
+            'existingResponsablesMap' => [],
         ]);
     }
 
@@ -113,15 +134,20 @@ final class InterventionController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_intervention_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Intervention $intervention, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository, ActionsRepository $actionsRepository): Response
+    public function edit(Request $request, Intervention $intervention, EntityManagerInterface $entityManager, JourDeLaSemaineRepository $jourRepository, ActionsRepository $actionsRepository, ResponsableRepository $responsableRepository): Response
     {
         $zonesClient = $intervention->getZonesClient();
         $contrat     = $intervention->getContrat();
 
+        $currentIntervenants = $intervention->getIntervenant()
+            ->map(fn($dii) => $dii->getIntervenant())
+            ->toArray();
+
         $form = $this->createForm(InterventionType::class, $intervention, [
-            'em'              => $entityManager,
-            'zones_client_id' => $zonesClient ? $zonesClient->getId() : null,
-            'contrat_id'      => $contrat ? $contrat->getId() : null,
+            'em'                   => $entityManager,
+            'zones_client_id'      => $zonesClient ? $zonesClient->getId() : null,
+            'contrat_id'           => $contrat ? $contrat->getId() : null,
+            'selected_intervenants' => $currentIntervenants,
         ]);
         $form->handleRequest($request);
 
@@ -158,6 +184,23 @@ final class InterventionController extends AbstractController
                 }
             }
 
+            // En édition : on supprime toutes les liaisons intervenant existantes
+            // puis on les recrée depuis la sélection du formulaire.
+            // Cela permet d'ajouter, retirer ou changer le responsable d'un intervenant.
+            foreach ($intervention->getIntervenant() as $dii) {
+                $entityManager->remove($dii);
+            }
+            $responsableForMap = $request->request->all('responsable_for');
+            foreach ($form->get('intervenants')->getData() as $intervenant) {
+                $dii = new DateIntervenationIntervenant();
+                $dii->setIntervention($intervention);
+                $dii->setIntervenant($intervenant);
+                $responsableId = $responsableForMap[$intervenant->getId()] ?? null;
+                if ($responsableId) {
+                    $dii->setResponsable($entityManager->find(Responsable::class, (int)$responsableId));
+                }
+                $entityManager->persist($dii);
+            }
             $entityManager->flush();
 
             // Recréer les supports et actions
@@ -176,14 +219,25 @@ final class InterventionController extends AbstractController
             $plagesMap[$jourId][$period] = $plage;
         }
 
+        // Construit la map [intervenant_id => responsable_id] pour pré-sélectionner
+        // le responsable déjà assigné à chaque intervenant dans le formulaire d'édition.
+        $existingResponsablesMap = [];
+        foreach ($intervention->getIntervenant() as $dii) {
+            if ($dii->getIntervenant() && $dii->getResponsable()) {
+                $existingResponsablesMap[$dii->getIntervenant()->getId()] = $dii->getResponsable()->getId();
+            }
+        }
+
         return $this->render('intervention/edit.html.twig', [
-            'intervention'  => $intervention,
-            'form'          => $form,
-            'jours'         => $jours,
-            'plagesMap'     => $plagesMap,
-            'actionsJson'   => $this->buildActionsJson($actionsRepository),
-            'suppInterJson' => $this->buildSuppInterJson($intervention),
-            'initialZoneId' => $zonesClient ? $zonesClient->getId() : null,
+            'intervention'             => $intervention,
+            'form'                     => $form,
+            'jours'                    => $jours,
+            'plagesMap'                => $plagesMap,
+            'actionsJson'              => $this->buildActionsJson($actionsRepository),
+            'suppInterJson'            => $this->buildSuppInterJson($intervention),
+            'initialZoneId'            => $zonesClient ? $zonesClient->getId() : null,
+            'responsablesData'        => $this->buildResponsablesData($responsableRepository),
+            'existingResponsablesMap' => $existingResponsablesMap,
         ]);
     }
 
@@ -196,6 +250,13 @@ final class InterventionController extends AbstractController
         }
 
         return $this->redirectToRoute('app_intervention_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    // Retourne tous les responsables de la DB pour les proposer
+    // dans le dropdown de chaque intervenant sélectionné.
+    private function buildResponsablesData(ResponsableRepository $responsableRepository): array
+    {
+        return $responsableRepository->findAll();
     }
 
     private function buildActionsJson(ActionsRepository $actionsRepository): string

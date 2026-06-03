@@ -321,13 +321,13 @@ class Intervention
      */
     public function getIntervenant(): Collection
     {
-        return $this->intervenant;
+        return $this->DateIntervenationIntervenant;
     }
 
     public function addIntervenant(DateIntervenationIntervenant $intervenant): static
     {
-        if (!$this->intervenant->contains($intervenant)) {
-            $this->intervenant->add($intervenant);
+        if (!$this->DateIntervenationIntervenant->contains($intervenant)) {
+            $this->DateIntervenationIntervenant->add($intervenant);
             $intervenant->setIntervention($this);
         }
 
@@ -336,8 +336,7 @@ class Intervention
 
     public function removeIntervenant(DateIntervenationIntervenant $intervenant): static
     {
-        if ($this->intervenant->removeElement($intervenant)) {
-            // set the owning side to null (unless already changed)
+        if ($this->DateIntervenationIntervenant->removeElement($intervenant)) {
             if ($intervenant->getIntervention() === $this) {
                 $intervenant->setIntervention(null);
             }

@@ -166,12 +166,75 @@
         </div>
     </div>
 
+    {#
+        SECTION INTERVENANTS + RESPONSABLES
+        ─────────────────────────────────────────────────────────────────
+        Le <select multiple> natif de Symfony est caché (display:none).
+        À la place, on affiche une grille de tuiles cliquables (tile-grid).
+        Cliquer sur une tuile appelle intTileToggle() qui :
+          1. Bascule la classe CSS "selected" sur la tuile (visuel).
+          2. Coche/décoche l'option correspondante dans le <select> caché
+             afin que Symfony récupère bien la valeur à la soumission.
+          3. Affiche/cache le bloc responsable correspondant à cet intervenant.
+
+        SECTION RESPONSABLE (int-responsable-section)
+        ─────────────────────────────────────────────────────────────────
+        Pour chaque intervenant, une ligne "Prénom Nom — Responsable : [select]"
+        est pré-rendue en HTML mais cachée (int-resp-hidden).
+        La liste propose TOUS les responsables de la DB.
+        Le select envoie : responsable_for[intervenant_id] = responsable_id
+        Le controller lit ce champ et l'enregistre dans DateIntervenationIntervenant.
+
+        En mode édition, existingResponsablesMap contient
+        [intervenant_id => responsable_id] pour pré-sélectionner les valeurs.
+    #}
+    <div class="form-group">
+        <label>Intervenants</label>
+        {# <select multiple> caché — synchronisé par JS avec les tuiles #}
+        {{ form_widget(form.intervenants, {'attr': {'id': 'tile-select-intervenants', 'style': 'display:none!important'}}) }}
+        {{ form_errors(form.intervenants) }}
+        <div class="tile-grid" id="int-tile-grid">
+            {% for choice in form.intervenants.vars.choices %}
+                <div class="tile-item{% if choice.value in form.intervenants.vars.value %} selected{% endif %}"
+                     data-tile-value="{{ choice.value }}"
+                     onclick="intTileToggle(this)">
+                    <span>{{ choice.label }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="int-responsable-section">
+            {# Une ligne par intervenant, même ordre que la tile-grid.
+               La correspondance tile ↔ ligne se fait par index dans intTileToggle(). #}
+            {% for choice in form.intervenants.vars.choices %}
+                {% set intId = choice.value %}
+                <div class="int-resp-row{% if choice.value not in form.intervenants.vars.value %} int-resp-hidden{% endif %}"
+                     id="int-resp-row-{{ intId }}">
+                    <span class="int-resp-label">{{ choice.label }} — Responsable :</span>
+                    <select name="responsable_for[{{ intId }}]" class="int-resp-select">
+                        <option value="">-- Aucun --</option>
+                        {% for resp in responsablesData %}
+                            <option value="{{ resp.id }}"
+                                {% if existingResponsablesMap[intId] is defined and existingResponsablesMap[intId] == resp.id %}selected{% endif %}>
+                                {{ resp.prenom }} {{ resp.nom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
     <input type="hidden" name="supp_inter_data" data-supp-inter-target="hiddenData">
 
     <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
 
 <style>
+#int-responsable-section { margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.int-resp-row { display: flex; align-items: center; gap: 0.8rem; padding: 0.4rem 0.6rem; background: #f0f2f5; border-radius: 5px; }
+.int-resp-hidden { display: none !important; }
+.int-resp-label { font-size: 0.88rem; font-weight: 600; color: #333; white-space: nowrap; }
+.int-resp-select { padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.88rem; }
 .duree-container { display: flex; align-items: center; gap: 10px; }
 .duree-input { width: 80px; padding: 8px; font-size: 1.2em; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
 .duree-separator { font-size: 1.5em; font-weight: bold; color: #333; }
@@ -498,6 +561,38 @@
 </style>
 
 <script>
+/**
+ * intTileToggle — gère le clic sur une tuile intervenant.
+ *
+ * 1. Bascule la classe "selected" sur la tuile (effet visuel bleu).
+ * 2. Coche/décoche l'option dans le <select> caché Symfony
+ *    pour que la valeur soit soumise avec le formulaire.
+ * 3. Affiche ou cache la ligne "Responsable" correspondante.
+ *    La correspondance se fait par INDEX (même ordre de boucle Twig
+ *    pour les tuiles et pour les lignes responsable), ce qui évite
+ *    tout risque de mismatch d'ID entre Twig et JS.
+ */
+function intTileToggle(tile) {
+    var isNow = !tile.classList.contains('selected');
+    tile.classList.toggle('selected', isNow);
+
+    // Synchronise le <select> caché
+    var select = document.getElementById('tile-select-intervenants');
+    if (select) {
+        var val = tile.getAttribute('data-tile-value');
+        Array.from(select.options).forEach(function(opt) {
+            if (opt.value === val) opt.selected = isNow;
+        });
+    }
+
+    // Affiche/cache la ligne responsable au même index que la tuile cliquée
+    var tiles = Array.from(document.querySelectorAll('#int-tile-grid .tile-item'));
+    var idx   = tiles.indexOf(tile);
+    var rows  = document.querySelectorAll('#int-responsable-section .int-resp-row');
+    if (idx >= 0 && rows[idx]) {
+        rows[idx].classList.toggle('int-resp-hidden', !isNow);
+    }
+}
 function esTileToggle(tile) {
     var isNow = !tile.classList.contains('selected');
     tile.classList.toggle('selected', isNow);

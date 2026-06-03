@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Entity\SitesClient;
 use App\Entity\Contrat;
 use App\Entity\ElementSecurite;
+use App\Entity\Intervenant;
 use App\Entity\Intervention;
 use App\Entity\Redacteur;
 use App\Entity\ZonesClient;
@@ -203,6 +204,20 @@ class InterventionType extends AbstractType
                 'multiple' => true,
                 'required' => false,
             ])
+            // Champ non mappé : la sélection des intervenants n'est pas gérée
+            // directement par Doctrine via ce champ, mais manuellement dans le
+            // controller (création de DateIntervenationIntervenant par intervenant).
+            // selected_intervenants permet de pré-cocher les intervenants en édition.
+            ->add('intervenants', EntityType::class, [
+                'class' => Intervenant::class,
+                'choice_label' => fn($i) => $i->getPrenom() . ' ' . $i->getNom(),
+                'multiple' => true,
+                'expanded' => false,
+                'mapped' => false,
+                'required' => false,
+                'label' => 'Intervenants',
+                'data' => $options['selected_intervenants'],
+            ])
         ;
     }
 
@@ -215,6 +230,7 @@ class InterventionType extends AbstractType
             'contrat_id' => null,
             'zones_client_id' => null,
             'em' => null,
+            'selected_intervenants' => [],
         ]);
     }
 }

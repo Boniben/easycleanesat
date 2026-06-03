@@ -15,6 +15,10 @@
 			<strong>Ajouter une intervention</strong>
 			<span>Creer une nouvelle intervention.</span>
 		</a>
+		<a class="dashboard-action" href="/easycleanesat/public/login">
+			<strong>Connexion admin</strong>
+			<span>Acceder aux modifications d'administration.</span>
+		</a>
 		{% if app.user and is_granted('ROLE_ADMIN') %}
 			<a class="dashboard-action" href="{{ path('app_admin') }}">
 				<strong>Administration</strong>

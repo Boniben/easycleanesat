@@ -31,23 +31,20 @@ class Intervenant
     #[ORM\OneToMany(targetEntity: DateIntervenationIntervenant::class, mappedBy: 'intervenant')]
     private Collection $dateIntervenationIntervenants;
 
-    /**
-     * @var Collection<int, Responsable>
-     */
-    #[ORM\OneToMany(targetEntity: Responsable::class, mappedBy: 'intervenant')]
-    private Collection $responsables;
+    #[ORM\ManyToOne(inversedBy: 'intervenants')]
+    private ?Responsable $responsable = null;
 
-    /**
-     * @var Collection<int, Handicap>
-     */
-    #[ORM\OneToMany(targetEntity: Handicap::class, mappedBy: 'intervenant')]
-    private Collection $handicaps;
+    #[ORM\ManyToOne(inversedBy: 'intervenants')]
+    private ?Handicap $handicap = null;
 
     public function __construct()
     {
         $this->dateIntervenationIntervenants = new ArrayCollection();
-        $this->responsables = new ArrayCollection();
-        $this->handicaps = new ArrayCollection();
+    }
+
+    public function __toString(): string
+    {
+        return $this->prenom . ' ' . $this->nom;
     }
 
     public function getId(): ?int
@@ -121,62 +118,28 @@ class Intervenant
         return $this;
     }
 
-    /**
-     * @return Collection<int, Responsable>
-     */
-    public function getResponsables(): Collection
+
+
+    public function getResponsable(): ?Responsable
     {
-        return $this->responsables;
+        return $this->responsable;
     }
 
-    public function addResponsable(Responsable $responsable): static
+    public function setResponsable(?Responsable $responsable): static
     {
-        if (!$this->responsables->contains($responsable)) {
-            $this->responsables->add($responsable);
-            $responsable->setIntervenant($this);
-        }
+        $this->responsable = $responsable;
 
         return $this;
     }
 
-    public function removeResponsable(Responsable $responsable): static
+    public function getHandicap(): ?Handicap
     {
-        if ($this->responsables->removeElement($responsable)) {
-            // set the owning side to null (unless already changed)
-            if ($responsable->getIntervenant() === $this) {
-                $responsable->setIntervenant(null);
-            }
-        }
-
-        return $this;
+        return $this->handicap;
     }
 
-    /**
-     * @return Collection<int, Handicap>
-     */
-    public function getHandicaps(): Collection
+    public function setHandicap(?Handicap $handicap): static
     {
-        return $this->handicaps;
-    }
-
-    public function addHandicap(Handicap $handicap): static
-    {
-        if (!$this->handicaps->contains($handicap)) {
-            $this->handicaps->add($handicap);
-            $handicap->setIntervenant($this);
-        }
-
-        return $this;
-    }
-
-    public function removeHandicap(Handicap $handicap): static
-    {
-        if ($this->handicaps->removeElement($handicap)) {
-            // set the owning side to null (unless already changed)
-            if ($handicap->getIntervenant() === $this) {
-                $handicap->setIntervenant(null);
-            }
-        }
+        $this->handicap = $handicap;
 
         return $this;
     }

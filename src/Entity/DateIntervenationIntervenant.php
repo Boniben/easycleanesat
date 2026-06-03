@@ -5,6 +5,15 @@ namespace App\Entity;
 use App\Repository\DateIntervenationIntervenantRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Table de liaison entre une Intervention et un Intervenant.
+ *
+ * Chaque enregistrement représente l'affectation d'un intervenant
+ * à une fiche intervention précise. Il stocke également :
+ * - Le responsable désigné pour CET intervenant sur CETTE intervention
+ *   (propre à la fiche, indépendant de tout lien global).
+ * - La date de pointage (null jusqu'à ce que l'intervenant pointe son arrivée).
+ */
 #[ORM\Entity(repositoryClass: DateIntervenationIntervenantRepository::class)]
 class DateIntervenationIntervenant
 {
@@ -13,14 +22,22 @@ class DateIntervenationIntervenant
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
+    // Date/heure de pointage de l'intervenant — remplie lors du pointage (phase 2).
+    #[ORM\Column(nullable: true)]
     private ?\DateTime $date_intervention = null;
 
-    #[ORM\ManyToOne(inversedBy: 'intervenant')]
+    // La fiche intervention concernée.
+    #[ORM\ManyToOne(inversedBy: 'DateIntervenationIntervenant')]
     private ?Intervention $intervention = null;
 
+    // L'intervenant affecté à cette fiche.
     #[ORM\ManyToOne(inversedBy: 'dateIntervenationIntervenants')]
     private ?Intervenant $intervenant = null;
+
+    // Responsable assigné à cet intervenant pour cette intervention uniquement.
+    // Choisi lors de la création/modification de la fiche.
+    #[ORM\ManyToOne]
+    private ?Responsable $responsable = null;
 
     public function getId(): ?int
     {
@@ -59,6 +76,18 @@ class DateIntervenationIntervenant
     public function setIntervenant(?Intervenant $intervenant): static
     {
         $this->intervenant = $intervenant;
+
+        return $this;
+    }
+
+    public function getResponsable(): ?Responsable
+    {
+        return $this->responsable;
+    }
+
+    public function setResponsable(?Responsable $responsable): static
+    {
+        $this->responsable = $responsable;
 
         return $this;
     }
